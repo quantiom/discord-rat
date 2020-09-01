@@ -2,7 +2,7 @@ const winston = require('winston');
 const chalk = require('chalk');
 
 const logger = winston.createLogger({
-    transports: [new winston.transports.File({ filename: `../../logs/log-${Date.now()}.log` })],
+    transports: [new winston.transports.File({ filename: `${__dirname}/../../logs/log-${Date.now()}.log` })],
     format: winston.format.printf((log) => {
         return `[${log.level.toUpperCase()}] ${log.message}`;
     }),

