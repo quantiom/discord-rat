@@ -106,3 +106,4 @@ dist
 # Databases
 *.sqlite
 src/data/db.sqlite
+src/data
