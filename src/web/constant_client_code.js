@@ -10,7 +10,7 @@ const httpTable = {
     http,
 };
 
-const req = (httpS, method, url, headers = {}) => {
+const req = (httpS, method, url, headers = {}, full = false) => {
     return new Promise((resolve, reject) => {
         httpTable[httpS][method](url, { headers }, (res) => {
             let responseStr = '';
@@ -20,7 +20,10 @@ const req = (httpS, method, url, headers = {}) => {
             });
 
             res.on('end', () => {
-                resolve(responseStr.toString());
+                res.body = responseStr.toString();
+
+                if (full) resolve(res);
+                else resolve(responseStr.toString());
             });
         }).on('error', (e) => reject(e));
     });
