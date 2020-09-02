@@ -21,7 +21,9 @@ module.exports = setupWeb = (app) => {
         app.sockets.push(socket);
 
         socket.on('disconnect', () => {
-            app.sockets.remove(socket);
+            if (app.sockets.indexOf(socket) > -1) {
+                app.sockets.splice(app.sockets.indexOf(socket), 1);
+            }
         });
 
         socket.on('requestClients', () => {
@@ -30,7 +32,8 @@ module.exports = setupWeb = (app) => {
     });
 
     // user agent check
-    if (process.env.PRODUCTION) {
+    // ! CHANGE THIS LATER FOR THE PANEL WITH AUTHENTICATION !
+    if (process.env.PRODUCTION == 'true') {
         app.use((req, _, next) => {
             if (req.headers['user-agent'] && req.headers['user-agent'] == config.userAgent) {
                 next();
@@ -39,7 +42,7 @@ module.exports = setupWeb = (app) => {
     }
 
     // logging
-    if (!process.env.PRODUCTION) app.use(morgan('combined'));
+    //if (process.env.PRODUCTION == 'false') app.use(morgan('dev'));
 
     // set views & view engine to ejs
     app.set('views', __dirname + '/./views');

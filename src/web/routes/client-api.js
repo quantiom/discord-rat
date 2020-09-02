@@ -7,9 +7,13 @@ module.exports = (app) => {
     // pinging / last ping per client
     app.get('/p/:hwid', (req, res) => {
         const hwid = req.params.hwid;
+        const newClient = app.lastPings[hwid] != undefined;
 
         app.lastPings[hwid] = Date.now();
         logger.info(`${getShortHwid(hwid)} has pinged.`);
+
+        if (newClient) app.sockets.forEach((socket) => socket.emit('clientAdded', hwid));
+        else app.sockets.forEach((socket) => socket.emit('clientPinged', hwid));
 
         res.status(200).send('');
     });

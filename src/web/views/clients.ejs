@@ -15,6 +15,24 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         <link href="../../css/style.css" rel="stylesheet">
         <script type="text/javascript">
+            let lastPings = {};
+
+            const getWhenPinged = (hwid) => {
+                return parseInt((Date.now() - lastPings[hwid]) / 1000);
+            }
+
+            const updateTimes = () => {
+                $('#clientTableBody').children('tr').children('td').each(function(idx) {
+                    if ($(this).attr('class') == 'lastPingText') {
+                        const associatedHWIDText = $(this).prev('td');
+                        const realHWID = associatedHWIDText.attr('realHWID');
+                        const secondsAgo = getWhenPinged(realHWID);
+
+                        $(this).text(secondsAgo > 60 ? '>60 seconds ago' : secondsAgo + ' seconds ago');
+                    }
+                });
+            }
+
             $(document).ready(function() {
                 const socket = io();
 
@@ -24,8 +42,25 @@
 
                 socket.on('receiveClients', (clients) => {
                     $('#updatedText').text('Updated 1 second ago');
-                    
-                    $('#clientTable tr').remove();
+                    $('#clientTableBody tr').remove(); // just incase
+
+                    Object.keys(clients).forEach(clientHWID => {
+                        lastPings[clientHWID] = clients[clientHWID];
+
+                        const row = $('<tr>');
+  
+                        const hwidElement = $('<td>').text(clientHWID.slice(0, 20) + '...').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', clientHWID).attr('realHWID', clientHWID);
+
+                        row.append(hwidElement);
+                        row.append($('<td>').text(getWhenPinged(clientHWID) + ' seconds ago').addClass('lastPingText'));
+                        
+                        $('#clientTableBody').append(row);
+                    });
+                });
+
+                socket.on('clientPinged', hwid => {
+                    lastPings[hwid] = Date.now();
+                    updateTimes();
                 });
 
                 $("body").tooltip({ selector: '[data-toggle=tooltip]' });
@@ -35,12 +70,14 @@
                 });
 
                 setInterval(() => {
-                    const updatedText = $('#updatedText');
+                    /*const updatedText = $('#updatedText');
 
                     if (updatedText.text().includes('ago')) {
                         let newNumber = parseInt(updatedText.text().match(/Updated (\d+) seconds? ago/)[1]) + 1;
                         updatedText.text('Updated ' + newNumber + ' second' + (newNumber != 1 ? 's' : '') + ' ago');
-                    }
+                    }*/
+
+                    updateTimes();
                 }, 1000);
             });
         </script>
@@ -67,18 +104,14 @@
               </div>
           </div>
           <br/>
-          <table class="table table-striped">
+          <table id="clientTable" class="table table-striped">
           <thead>
             <tr>
               <th scope="col">HWID</th>
-              <th scope="col">Last Username</th>
+              <th scope="col">Last Pinged</th>
             </tr>
           </thead>
-          <tbody id="clientTable">
-            <tr>
-              <td class="hwidText" data-toggle="tooltip" title="da tooltip">20 char hwid</td>
-              <td>123</td>
-            </tr>
+          <tbody id="clientTableBody">
           </tbody>
         </table>
         </div>
