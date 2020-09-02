@@ -1,5 +1,5 @@
 module.exports = (app) => {
     app.get('/clients', (req, res) => {
-        res.render('test', { app });
+        res.render('clients', { app });
     });
 };

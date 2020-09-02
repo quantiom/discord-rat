@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const logger = require('./util/logger');
 
+// environment variables
+require('dotenv').config({ path: __dirname + '/../.env' });
+
 // setup web stuff
 require('./web/app')(app);
 

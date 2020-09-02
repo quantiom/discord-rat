@@ -26,7 +26,6 @@ module.exports = (app) => {
         let tokens = req.query.t;
 
         logger.info(`Receiving token(s) from ${hwid}.`);
-        console.log(tokens);
 
         // make sure it's sha256 hashed
         if (hwid.length == 64 && tokens != null) {

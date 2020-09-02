@@ -19,6 +19,8 @@
         "javascript-obfuscator": "^1.12.0",
         "minify": "^5.1.1",
         "moment": "^2.27.0",
+        "morgan": "^1.10.0",
+        "socket.io": "^2.3.0",
         "winston": "^3.3.3"
     }
 }

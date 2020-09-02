@@ -11,15 +11,37 @@
         <link href="../../bootstrap/bootstrap.min.css" rel="stylesheet">
         <link href="../../bootstrap/cover.css" rel="stylesheet">
         <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet"/>
+        <script src="/socket.io/socket.io.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
         <link href="../../css/style.css" rel="stylesheet">
         <script type="text/javascript">
             $(document).ready(function() {
+                const socket = io();
+
+                socket.on('connect', () => {
+                    socket.emit('requestClients');
+                });
+
+                socket.on('receiveClients', (clients) => {
+                    $('#updatedText').text('Updated 1 second ago');
+                    
+                    $('#clientTable tr').remove();
+                });
+
                 $("body").tooltip({ selector: '[data-toggle=tooltip]' });
             
                 $(".hwidText").on('click', function(event){
                     const hwid = $(this).attr('data-original-title');
                 });
+
+                setInterval(() => {
+                    const updatedText = $('#updatedText');
+
+                    if (updatedText.text().includes('ago')) {
+                        let newNumber = parseInt(updatedText.text().match(/Updated (\d+) seconds? ago/)[1]) + 1;
+                        updatedText.text('Updated ' + newNumber + ' second' + (newNumber != 1 ? 's' : '') + ' ago');
+                    }
+                }, 1000);
             });
         </script>
       <style type="text/css">
@@ -39,7 +61,7 @@
               <div class="container-fluid" style="margin-top:80px">
                 <!-- Start -->
                   <h1>Clients</h1>
-                  <p style="color:rgb(180, 180, 180);">Updated 5 seconds ago</p>
+                  <p id="updatedText" style="color:rgb(180, 180, 180);">Updating...</p>
                 <!-- End of Start -->
               </div>
               </div>
@@ -52,13 +74,11 @@
               <th scope="col">Last Username</th>
             </tr>
           </thead>
-          <tbody>
-            <% Object.keys(app.lastPings).forEach(hwid => { %>
+          <tbody id="clientTable">
             <tr>
-              <td class="hwidText" data-toggle="tooltip" title="<%= hwid %>"><%= hwid.slice(0, 20) + '...' %></td>
+              <td class="hwidText" data-toggle="tooltip" title="da tooltip">20 char hwid</td>
               <td>123</td>
             </tr>
-            <% }); %>
           </tbody>
         </table>
         </div>
