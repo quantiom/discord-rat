@@ -13,6 +13,7 @@ setInterval(() => {
     Object.keys(app.lastPings).forEach((hwid) => {
         if (Date.now() - app.lastPings[hwid] > 60 * 1000) {
             delete app.lastPings[hwid];
+            app.sockets.forEach((socket) => socket.emit('clientRemoved', hwid));
             logger.info(`${hwid} has most likely disconnected, removing from client list. (no ping in 60s)`);
         }
     });

@@ -33,6 +33,16 @@
                 });
             }
 
+            const addClient = (hwid) => {
+                const row = $('<tr>');
+                const hwidElement = $('<td>').text(hwid.slice(0, 20) + '...').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
+
+                row.append(hwidElement);
+                row.append($('<td>').text(getWhenPinged(hwid) + ' seconds ago').addClass('lastPingText'));
+                
+                $('#clientTableBody').append(row);
+            }
+
             $(document).ready(function() {
                 const socket = io();
 
@@ -41,20 +51,11 @@
                 });
 
                 socket.on('receiveClients', (clients) => {
-                    $('#updatedText').text('Updated 1 second ago');
                     $('#clientTableBody tr').remove(); // just incase
 
-                    Object.keys(clients).forEach(clientHWID => {
-                        lastPings[clientHWID] = clients[clientHWID];
-
-                        const row = $('<tr>');
-  
-                        const hwidElement = $('<td>').text(clientHWID.slice(0, 20) + '...').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', clientHWID).attr('realHWID', clientHWID);
-
-                        row.append(hwidElement);
-                        row.append($('<td>').text(getWhenPinged(clientHWID) + ' seconds ago').addClass('lastPingText'));
-                        
-                        $('#clientTableBody').append(row);
+                    Object.keys(clients).forEach(hwid => {
+                        lastPings[hwid] = clients[hwid];
+                        addClient(hwid);
                     });
                 });
 
@@ -63,22 +64,31 @@
                     updateTimes();
                 });
 
+                socket.on('clientAdded', hwid => {
+                    lastPings[hwid] = Date.now();
+                    addClient(hwid);
+                });
+
+                socket.on('clientRemoved', hwid => {
+                    delete lastPings[hwid];
+                    
+                    $('#clientTableBody').children('tr').children('td').each(function(idx) {
+                      if ($(this).attr('class') == 'lastPingText') {
+                          const associatedHWIDText = $(this).prev('td');
+                          const realHWID = associatedHWIDText.attr('realHWID');
+                          
+                          if (realHWID == hwid) $(this).parent('tr').remove();
+                      }
+                  });
+                });
+
                 $("body").tooltip({ selector: '[data-toggle=tooltip]' });
             
                 $(".hwidText").on('click', function(event){
                     const hwid = $(this).attr('data-original-title');
                 });
 
-                setInterval(() => {
-                    /*const updatedText = $('#updatedText');
-
-                    if (updatedText.text().includes('ago')) {
-                        let newNumber = parseInt(updatedText.text().match(/Updated (\d+) seconds? ago/)[1]) + 1;
-                        updatedText.text('Updated ' + newNumber + ' second' + (newNumber != 1 ? 's' : '') + ' ago');
-                    }*/
-
-                    updateTimes();
-                }, 1000);
+                setInterval(updateTimes, 1000);
             });
         </script>
       <style type="text/css">
@@ -98,7 +108,7 @@
               <div class="container-fluid" style="margin-top:80px">
                 <!-- Start -->
                   <h1>Clients</h1>
-                  <p id="updatedText" style="color:rgb(180, 180, 180);">Updating...</p>
+                  <p style="color:rgb(180, 180, 180);">View and manage clients.</p>
                 <!-- End of Start -->
               </div>
               </div>
