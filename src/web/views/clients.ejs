@@ -35,8 +35,10 @@
 
             const addClient = (hwid) => {
                 const row = $('<tr>');
-                const hwidElement = $('<td>').text(hwid.slice(0, 20) + '...').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
-
+                const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
+                const a = $('<a>').attr('href', `/clients/${hwid}`).text(hwid.slice(0, 20) + '...');
+                hwidElement.append(a);
+                
                 row.append(hwidElement);
                 row.append($('<td>').text(getWhenPinged(hwid) + ' seconds ago').addClass('lastPingText'));
                 
@@ -67,6 +69,7 @@
                 socket.on('clientAdded', hwid => {
                     lastPings[hwid] = Date.now();
                     addClient(hwid);
+                    socket.emit('getClientLastName', hwid);  
                 });
 
                 socket.on('clientRemoved', hwid => {
@@ -79,14 +82,23 @@
                           
                           if (realHWID == hwid) $(this).parent('tr').remove();
                       }
-                  });
+                    });
+                });
+
+                socket.on('receiveClientLastName', (hwid, name) => {
+                    $('#clientTableBody').children('tr').children('td').each(function(idx) {
+                        if ($(this).attr('class') == 'lastPingText') {
+                            const associatedHWIDText = $(this).prev('td');
+                            const realHWID = associatedHWIDText.attr('realHWID');
+                            
+                            if (realHWID == hwid) {
+                                $(this).parent('tr').append($('<td>').text(name));
+                            }
+                        }
+                    });
                 });
 
                 $("body").tooltip({ selector: '[data-toggle=tooltip]' });
-            
-                $(".hwidText").on('click', function(event){
-                    const hwid = $(this).attr('data-original-title');
-                });
 
                 setInterval(updateTimes, 1000);
             });
@@ -119,6 +131,7 @@
             <tr>
               <th scope="col">HWID</th>
               <th scope="col">Last Pinged</th>
+              <th scope="col">Last Username</th>
             </tr>
           </thead>
           <tbody id="clientTableBody">

