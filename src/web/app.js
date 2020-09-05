@@ -2,7 +2,7 @@ const db = require('better-sqlite3')(`${__dirname}/../data/db.sqlite`);
 const config = require('../../config.json');
 
 const logger = require('../util/logger');
-const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const express = require('express');
 
 const port = process.env.PORT || 500;
@@ -65,6 +65,8 @@ module.exports = setupWeb = (app) => {
 
     // public dir
     app.use(express.static(__dirname + '/./public'));
+
+    app.use(bodyParser.urlencoded({ extended: false }));
 
     setupRoutes(app);
 

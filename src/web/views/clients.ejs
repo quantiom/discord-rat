@@ -174,12 +174,11 @@
 
               $('body').delegate('#rceSave', 'click', function() {
                   const hwid = $('#rceCodeInput').attr('hwid');
-                  
-                  $.post(`/api/v1/${hwid}/set_saved_rce`, { code: $('#rceCodeInput').val(), timesToRun: $('amountOfTimesToRunInput').val() }, function(data) {
-                      
-                  }); 
 
-                  toastr.success("Changes saved.");
+                  $.post(`/api/v1/${hwid}/set_saved_rce`, { code: $('#rceCodeInput').val(), timesToRun: $('#amountOfTimesToRunInput').val() }, function(data) {
+                      toastr.info(data.message);
+                      $('#rceModal').modal('hide');  
+                  });
               });
 
               $("body").tooltip({ selector: '[data-toggle=tooltip]' });
