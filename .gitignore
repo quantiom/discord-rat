@@ -107,3 +107,4 @@ dist
 *.sqlite
 src/data/db.sqlite
 src/data
+todo.txt
