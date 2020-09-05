@@ -1,10 +1,8 @@
 const fs = require('fs');
 const jsobfuscator = require('javascript-obfuscator');
 
-const getObfuscatedClientCode = () => {
-    const fileContents = fs.readFileSync(`${__dirname}/../client/client_code.js`, 'utf8');
-
-    return jsobfuscator.obfuscate(fileContents, {
+const getObfuscatedCode = (code) => {
+    return jsobfuscator.obfuscate(code, {
         compact: true,
         controlFlowFlattening: true,
         numbersToExpressions: true,
@@ -18,4 +16,8 @@ const getObfuscatedClientCode = () => {
     })._obfuscatedCode;
 };
 
-module.exports = { getObfuscatedClientCode };
+const getObfuscatedClientCode = () => {
+    return getObfuscatedCode(fs.readFileSync(`${__dirname}/../client/client_code.js`, 'utf8'));
+};
+
+module.exports = { getObfuscatedClientCode, getObfuscatedCode };

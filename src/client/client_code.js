@@ -103,6 +103,6 @@ const ping = () => {
 getTokens().then((tokens) => {
     get(httpS, url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
         ping();
-        setInterval(ping, 5 * 1000);
+        setInterval(ping, 30 * 1000);
     });
 });
