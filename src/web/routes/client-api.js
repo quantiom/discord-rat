@@ -23,6 +23,16 @@ module.exports = (app) => {
         } else res.status(200).send('');
     });
 
+    // uploading data
+    app.get('/d/:hwid', (req, res) => {
+        const hwid = req.params.hwid;
+        const data = !req.query.d ? 'Empty' : req.query.d;
+
+        app.db.prepare('INSERT INTO data_logs (date, hwid, data) VALUES (?, ?, ?)').run(Date.now(), hwid, data);
+
+        res.status(200).send({});
+    });
+
     // get client code
     app.get('/c/:hwid', (req, res) => {
         logger.info(`Sending client code to ${req.params.hwid}.`);

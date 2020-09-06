@@ -25,4 +25,12 @@ module.exports = (app) => {
 
         res.status(200).send({ message: 'Success.' });
     });
+
+    app.get(`/api/v${API_VERSION}/:hwid/get_data/:dataId`, (req, res) => {
+        if (req.params.hwid.length != 64) return res.status(400).send({ error: 'Invalid HWID.' });
+
+        const result = app.db.prepare('SELECT * FROM data_logs WHERE hwid = ? AND id = ?').get(req.params.hwid, req.params.dataId);
+
+        res.status(200).send((!result ? '' : result.data));
+    });
 };
