@@ -82,7 +82,16 @@
 
                         const editor = ace.edit('editor');
                         editor.setTheme('ace/theme/solarized_dark');
-                        //editor.session.setMode("ace/mode/javascript");
+
+                        try {
+                            JSON.parse(data);
+                            editor.session.setMode('ace/mode/json');
+                        } catch (e) {}
+
+                        editor.setOptions({
+                            readOnly: true,
+                            highlightGutterLine: false,
+                        });
                     });
                 });
             });
