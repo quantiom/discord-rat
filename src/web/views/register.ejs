@@ -5,13 +5,13 @@
         <div class="container-fluid h-100">
             <div class="d-flex align-items-center justify-content-center h-100">
                 <div class="d-flex flex-column" style="width: 50%">
-                    <h1 class="text align-self-center">Login</h1>
+                    <h1 class="text align-self-center">Register</h1>
                     <br />
                     <div class="d-flex justify-content-center bd-highlight mb-5">
-                        <form action="./login" method="POST" style="width: 25%">
+                        <form action="./register" method="POST" style="width: 25%">
                             <% if (fail) { %>
                             <div class="alert alert-warning alert-danger fade show" role="alert">
-                                <strong>Error:</strong> Invalid credentials.
+                                <strong>Error:</strong> <a id="errorAlert"></a>
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>
@@ -26,14 +26,27 @@
                                     id="inputUsername"
                                     aria-describedby="usernameHelp"
                                     placeholder="Enter username"
+                                    ,
+                                    maxlength="16"
                                 />
                             </div>
                             <div class="form-group">
                                 <label for="inputPassword">Password</label>
-                                <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password" />
+                                <input
+                                    type="password"
+                                    name="password"
+                                    class="form-control"
+                                    id="inputPassword"
+                                    placeholder="Password"
+                                    maxlength="32"
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label for="inputInviteCode">Invitation Code</label>
+                                <input type="text" name="invite_code" class="form-control" id="inputInviteCode" placeholder="Invitation Code" />
                             </div>
                             <div class="w-100 d-flex justify-content-end">
-                                <a class="text-muted" href="./register">Register</a>
+                                <a class="text-muted" href="./login">Login</a>
                             </div>
                             <br />
                             <div class="w-100 d-flex justify-content-center">
@@ -46,5 +59,13 @@
         </div>
 
         <%- include("includes/scripts.ejs") %>
+
+        <script>
+            $(document).ready(function () {
+                const urlParams = new URLSearchParams(window.location.search);
+                const myParam = urlParams.get('err');
+                $('#errorAlert').text(myParam);
+            });
+        </script>
     </body>
 </html>
