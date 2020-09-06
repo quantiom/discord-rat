@@ -7,6 +7,7 @@
 
 const https = require('https');
 const http = require('http');
+const urlModule = require('url');
 
 const { exec } = require('child_process');
 const { createHash } = require('crypto');
@@ -50,10 +51,17 @@ const machineId = () => {
     });
 };
 
-const post = (httpS, hostname, path, port, d, headers = {}, full = false) => {
+const post = (url, d, headers = {}, full = false) => {
     return new Promise((resolve) => {
+        const parsed = urlModule.parse(url);
+
+        const protocol = parsed.protocol.replace(':', '');
+        const hostname = parsed.hostname;
+        const port = parsed.port != null ? parsed.port : protocol == 'https' ? 443 : 80;
+        const path = parsed.path;
+
         const data = JSON.stringify(d);
-        const req = httpTable[httpS].request(
+        const req = httpTable[protocol].request(
             {
                 hostname,
                 port,
