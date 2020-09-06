@@ -53,6 +53,7 @@
         </div>
 
         <%- include("includes/scripts.ejs") %>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.13.0/beautify.min.js"></script>
 
         <script type="text/javascript">
             $(document).ready(function () {
@@ -86,6 +87,7 @@
                         try {
                             JSON.parse(data);
                             editor.session.setMode('ace/mode/json');
+                            editor.setValue(js_beautify(editor.getSession().getValue()), 1);
                         } catch (e) {}
 
                         editor.setOptions({
