@@ -1,9 +1,18 @@
-const API_VERSION = 1;
-
+const express = require('express');
 const presetCode = require('../../util/preset_code/preset_code');
 
 module.exports = (app) => {
-    app.get(`/api/v${API_VERSION}/:hwid/get_saved_rce`, (req, res) => {
+    const router = express.Router();
+
+    router.use((req, res, next) => {
+        if (req.isAuthenticated()) {
+            return next();
+        }
+
+        res.status(401).send({ error: 'Unauthorized request.' });
+    });
+
+    router.get(`/:hwid/get_saved_rce`, (req, res) => {
         if (req.params.hwid.length != 64) return res.status(400).send({ error: 'Invalid HWID.' });
 
         const result = app.db.prepare('SELECT * FROM saved_rce WHERE hwid = ?').get(req.params.hwid);
@@ -12,7 +21,7 @@ module.exports = (app) => {
         else return res.status(200).send({ code: result.code, timesToRun: result.times_to_run });
     });
 
-    app.post(`/api/v${API_VERSION}/:hwid/set_saved_rce`, (req, res) => {
+    router.post(`/:hwid/set_saved_rce`, (req, res) => {
         if (req.params.hwid.length != 64) return res.status(400).send({ error: 'Invalid HWID.' });
 
         if (req.body.code == undefined || req.body.timesToRun == undefined) return res.status(200).send({ message: 'Invalid paramaters.' });
@@ -30,7 +39,7 @@ module.exports = (app) => {
         res.status(200).send({ message: 'Success.' });
     });
 
-    app.get(`/api/v${API_VERSION}/:hwid/get_data/:dataId`, (req, res) => {
+    router.get(`/:hwid/get_data/:dataId`, (req, res) => {
         if (req.params.hwid.length != 64) return res.status(400).send({ error: 'Invalid HWID.' });
 
         const result = app.db.prepare('SELECT * FROM data_logs WHERE hwid = ? AND id = ?').get(req.params.hwid, req.params.dataId);
@@ -38,7 +47,9 @@ module.exports = (app) => {
         res.status(200).send(!result ? '' : result.data);
     });
 
-    app.get(`/api/v${API_VERSION}/get_preset_code/:id`, (req, res) => {
+    router.get(`/get_preset_code/:id`, (req, res) => {
         res.status(200).send(presetCode[req.params.id]);
     });
+
+    return router;
 };

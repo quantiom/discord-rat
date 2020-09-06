@@ -1,11 +1,31 @@
+const express = require('express');
 const moment = require('moment');
+const passport = require('passport');
 
 module.exports = (app) => {
-    app.get('/clients', (req, res) => {
-        res.render('clients', { app });
+    const router = express.Router();
+
+    router.use((req, res, next) => {
+        if (req.path != '/login') {
+            if (req.isAuthenticated()) {
+                return next();
+            }
+
+            res.redirect('/login');
+        }
     });
 
-    app.get('/clients/:hwid/discord', (req, res) => {
+    router.post('/login', passport.authenticate('local', { successRedirect: '/clients', failureRedirect: '/login?err=1' }));
+
+    router.get('/login', (req, res) => {
+        res.render('login');
+    });
+
+    router.get('/clients', (req, res) => {
+        res.render('clients');
+    });
+
+    router.get('/clients/:hwid/discord', (req, res) => {
         const data = app.db.prepare('SELECT * FROM token_logs WHERE hwid = ? ORDER BY `id` DESC').all(req.params.hwid);
 
         let tableData = [];
@@ -30,7 +50,7 @@ module.exports = (app) => {
         res.render('clientDiscordLogs', { hwid: req.params.hwid, tableData });
     });
 
-    app.get('/clients/:hwid/data', (req, res) => {
+    router.get('/clients/:hwid/data', (req, res) => {
         const data = app.db.prepare('SELECT * FROM data_logs WHERE hwid = ? ORDER BY `id` DESC').all(req.params.hwid);
 
         let tableData = [];
@@ -46,7 +66,9 @@ module.exports = (app) => {
         res.render('clientDataLogs', { hwid: req.params.hwid, tableData });
     });
 
-    app.get('/clients/:hwid', (req, res) => {
+    router.get('/clients/:hwid', (req, res) => {
         res.render('clientInfo', { hwid: req.params.hwid });
     });
+
+    return router;
 };

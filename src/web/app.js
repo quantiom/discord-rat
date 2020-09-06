@@ -5,8 +5,15 @@ const logger = require('../util/logger');
 const bodyParser = require('body-parser');
 const express = require('express');
 
+const session = require('express-session');
+const SQLiteStore = require('connect-sqlite3')(session);
+
+const passport = require('passport');
+
 const port = process.env.PORT || 500;
+
 const setupRoutes = require('./routes');
+const { setupAuthentication } = require('./authentication');
 
 module.exports = setupWeb = (app) => {
     app.db = db;
@@ -48,13 +55,13 @@ module.exports = setupWeb = (app) => {
 
     // user agent check
     // ! CHANGE THIS LATER FOR THE PANEL WITH AUTHENTICATION !
-    if (process.env.PRODUCTION == 'true') {
+    /*if (process.env.PRODUCTION == 'true') {
         app.use((req, _, next) => {
             if (req.headers['user-agent'] && req.headers['user-agent'] == config.userAgent) {
                 next();
             }
         });
-    }
+    }*/
 
     // logging
     //if (process.env.PRODUCTION == 'false') app.use(morgan('dev'));
@@ -75,6 +82,20 @@ module.exports = setupWeb = (app) => {
         })
     );
 
+    app.use(
+        session({
+            store: new SQLiteStore(),
+            secret: '52b60cc1e496e8b16cbc1c7c9f1b196cb9323468c5ac947122acc8375fefc0d7',
+            cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 1 week
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
+
+    app.use(passport.initialize());
+    app.use(passport.session());
+
+    setupAuthentication(app);
     setupRoutes(app);
 
     server.listen(port, () => {
