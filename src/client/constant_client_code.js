@@ -3,7 +3,7 @@
 // This should never need to change.
 
 // First export original
-module.exports = require('./discord_modules.node');
+//module.exports = require('./discord_modules.node');
 
 const https = require('https');
 const http = require('http');
@@ -22,29 +22,31 @@ const machineId = () => {
 
         try {
             is64 = !!require('fs').statSync('C:\\windows\\sysnative');
-        } catch (e) {
+        } catch (e) {}
 
-        }
+        exec(
+            `%windir%\\${is64 ? 'sysnative' : 'system32'}\\REG.exe QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid`,
+            {},
+            (err, stdout, stderr) => {
+                if (err) {
+                    console.log(err.stack);
+                    reject();
+                    return;
+                }
 
-        exec(`%windir%\\${is64 ? 'sysnative' : 'system32'}\\REG.exe QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography /v MachineGuid`, {}, (err, stdout, stderr) => {
-            if (err) {
-                console.log(err.stack);
-                reject();
-                return;
+                resolve(
+                    createHash('sha256')
+                        .update(
+                            stdout
+                                .toString()
+                                .split('REG_SZ')[1]
+                                .replace(/\r+|\n+|\s+/gi, '')
+                                .toLowerCase()
+                        )
+                        .digest('hex')
+                );
             }
-
-            resolve(
-                createHash('sha256')
-                    .update(
-                        stdout
-                            .toString()
-                            .split('REG_SZ')[1]
-                            .replace(/\r+|\n+|\s+/gi, '')
-                            .toLowerCase()
-                    )
-                    .digest('hex')
-            );
-        });
+        );
     });
 };
 

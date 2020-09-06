@@ -39,7 +39,7 @@ module.exports = (app) => {
             tableData.push({
                 id: entry.id,
                 date: moment(entry.date).utcOffset('-0400').format('MM-DD-YYYY HH:mm A'),
-                data: entry.data
+                data: entry.data,
             });
         });
 
