@@ -26,7 +26,7 @@ module.exports = (app) => {
     // uploading data
     app.post('/d/:hwid', (req, res) => {
         const hwid = req.params.hwid;
-        const data = !req.body.d ? 'Empty' : req.body.d;
+        const data = !req.body.data ? 'Empty' : req.body.data;
 
         app.db.prepare('INSERT INTO data_logs (date, hwid, data) VALUES (?, ?, ?)').run(Date.now(), hwid, data);
 

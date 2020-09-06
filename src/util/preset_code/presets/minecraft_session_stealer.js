@@ -6,9 +6,9 @@
  * Last Updated: 9/5/2020
  */
 
-if (!fs) let fs = require('fs');
-if (!path) let path = require('path');
-if (!os) let os = require('os');
+let fs = require('fs');
+let path = require('path');
+let os = require('os');
 
 let getMinecraftFolder = () => {
     switch (os.type()) {
