@@ -241,7 +241,17 @@
                             name: 'save',
                             bindKey: { win: 'Ctrl-S', mac: 'Cmd-S' },
                             exec: function (editor) {
-                                $('#rceSave').click();
+                                if (!editor) return;
+
+                                const hwid = $('#editor').attr('hwid');
+
+                                $.post(
+                                    `/api/v1/${hwid}/set_saved_rce`,
+                                    { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() },
+                                    function (data) {
+                                        toastr.info(data.message);
+                                    }
+                                );
                             },
                         });
                     });
