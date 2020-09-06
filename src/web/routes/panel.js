@@ -43,6 +43,11 @@ module.exports = (app) => {
         res.render('login', { fail: req.query.err != undefined });
     });
 
+    router.get('/logout', (req, res) => {
+        req.logout();
+        res.redirect('login');
+    });
+
     router.get('/clients', (req, res) => {
         res.render('clients');
     });
