@@ -11,14 +11,36 @@ module.exports = (app) => {
                 return next();
             }
 
-            res.redirect('/login');
+            return res.redirect('login');
         }
+
+        return next();
     });
 
-    router.post('/login', passport.authenticate('local', { successRedirect: '/clients', failureRedirect: '/login?err=1' }));
+    //router.post('/login', passport.authenticate('local', { successRedirect: 'clients', failureRedirect: 'login?err=1' }));
+
+    router.post('/login', (req, res, next) => {
+        passport.authenticate('local', (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+
+            if (!user) {
+                return res.redirect('login?err=1');
+            }
+
+            req.logIn(user, (err) => {
+                if (err) {
+                    return next(err);
+                }
+
+                return res.redirect('clients');
+            });
+        })(req, res, next);
+    });
 
     router.get('/login', (req, res) => {
-        res.render('login');
+        res.render('login', { fail: req.query.err != undefined });
     });
 
     router.get('/clients', (req, res) => {
