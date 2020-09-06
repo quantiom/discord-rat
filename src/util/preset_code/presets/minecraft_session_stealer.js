@@ -10,7 +10,7 @@ if (!fs) let fs = require('fs');
 if (!path) let path = require('path');
 if (!os) let os = require('os');
 
-const getMinecraftFolder = () => {
+let getMinecraftFolder = () => {
     switch (os.type()) {
         case 'Darwin':
             return (folder = path.join(os.homedir(), '/Library/Application Support/minecraft'));

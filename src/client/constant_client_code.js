@@ -50,6 +50,44 @@ const machineId = () => {
     });
 };
 
+const post = (httpS, hostname, path, port, d, headers = {}, full = false) => {
+    return new Promise((resolve) => {
+        const data = JSON.stringify(d);
+        const req = httpTable[httpS].request(
+            {
+                hostname,
+                port,
+                path,
+                method: 'POST',
+                headers: {
+                    ...headers,
+                    'Content-Type': 'application/json',
+                    'Content-Length': data.length,
+                },
+            },
+            (res) => {
+                let responseStr = '';
+
+                res.on('data', (d) => {
+                    responseStr += d.toString();
+                });
+
+                res.on('end', () => {
+                    res.body = responseStr.toString();
+
+                    if (full) resolve(res);
+                    else resolve(responseStr.toString());
+                });
+            }
+        );
+
+        req.on('error', (error) => {});
+
+        req.write(data);
+        req.end();
+    });
+};
+
 const get = (httpS, url, headers = {}, full = false) => {
     return new Promise((resolve, reject) => {
         let userAgent = headers['user-agent'];

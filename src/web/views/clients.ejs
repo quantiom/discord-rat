@@ -219,9 +219,11 @@
                                 <code>machineId()</code> <small class="text-muted">Returns client's HWID</small><br/>
                                 <code>postData(data)</code> <small class="text-muted">Adds data to the client's data logs</small><br/>
                                 <code>get('http(s)', url, headers, full)</code> <small class="text-muted">Makes a GET request</small><br/>
+                                <code>post('http(s)', hostname, path, port, data, headers, full)</code> <small class="text-muted">Makes a POST request</small><br/>
                                 <code>ping()</code> <small class="text-muted">Ping function</small><br/>
                                 <code>hwid</code> <small class="text-muted">Client's HWID</small><br/>
-                                <code>url</code> <small class="text-muted">Base URL (i.e. http://localhost:500)</small>
+                                <code>url</code> <small class="text-muted">Base URL (i.e. http://localhost:500)</small><br/>
+                                <small class="text-muted">* Avoid using <code>const</code> to prevent reassignment errors</small>
                                 <br/>
                                 <br/>
                                 <label for="amountOfTimesToRunInput">Amount of times to run</label>
