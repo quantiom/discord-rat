@@ -73,7 +73,7 @@
 
                     const dataModalBody = $('#dataModalBody');
 
-                    $.get(`/api/v1/<%= hwid %>/get_data/${id}`, function (data) {
+                    $.get(`/api/<%= hwid %>/get_data/${id}`, function (data) {
                         dataModalBody.empty();
                         dataModalBody.append(`<div class="form-group">
                                 <!-- <textarea id="dataInput" class="form-control" placeholder="Empty" rows="10" readonly>${data}</textarea> -->

