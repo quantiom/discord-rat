@@ -49,4 +49,8 @@ module.exports = (app) => {
     app.get('/clients/:hwid', (req, res) => {
         res.render('clientInfo', { hwid: req.params.hwid });
     });
+
+    app.get('/aceTest', (req, res) => {
+        res.render('aceTest');
+    });
 };

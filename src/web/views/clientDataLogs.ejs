@@ -8,10 +8,6 @@
                 <div class="d-flex flex-column" style="width: 25%">
                     <h1 class="text align-self-center"><a style="font-size: 36px" href="#" onclick="window.history.back()">«</a> Data Logs</h1>
                     <p class="text align-self-center" style="padding-bottom:25px;color:rgb(180, 180, 180);">Showing data logs for <%= hwid %>.</p>
-                    <div id="editor">function foo(items) {
-                        var x = "All this is syntax highlighted";
-                        return x;
-                    }</div>
                     <table id="logTable" class="table justify-content-center align-items-center text-center">
                         <thead>
                             <tr>
@@ -34,7 +30,7 @@
 
                 <!-- Data Modal -->
                 <div class="modal fade" id="dataModal" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
+                    <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="dataModalLabel">Data View</h5>
@@ -55,13 +51,6 @@
                 </div>
             </div>
         </div>
-
-        <script src="/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script>
-            var editor = ace.edit("editor");
-            editor.setTheme("/ace/monokai");
-            editor.session.setMode("http://localhost:500/ace/mode/javascript");
-        </script>
 
         <%- include("includes/scripts.ejs") %>
 
@@ -87,8 +76,13 @@
                     $.get(`/api/v1/<%= hwid %>/get_data/${id}`, function(data) {
                         dataModalBody.empty();
                         dataModalBody.append(`<div class="form-group">
-                                <textarea id="dataInput" class="form-control" placeholder="Empty" rows="10" readonly>${data}</textarea>
-                        </div>`); 
+                                <!-- <textarea id="dataInput" class="form-control" placeholder="Empty" rows="10" readonly>${data}</textarea> -->
+                                <div id="editor">${data}</div>
+                        </div>`);
+                        
+                        const editor = ace.edit("editor");
+                        editor.setTheme("ace/theme/solarized_dark");
+                        //editor.session.setMode("ace/mode/javascript");
                     });
                 });
             });

