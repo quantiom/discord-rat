@@ -126,6 +126,7 @@ module.exports = (app) => {
                 id: entry.id,
                 date: moment(entry.date).utcOffset('-0400').format('MM-DD-YYYY HH:mm A'),
                 data: entry.data,
+                description: entry.description || 'Not specified',
             });
         });
 

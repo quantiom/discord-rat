@@ -14,6 +14,7 @@
                                 <th scope="col">ID</th>
                                 <th scope="col">Date</th>
                                 <th scope="col">Data</th>
+                                <th scope="col">Description</th>
                             </tr>
                         </thead>
                         <tbody id="logTableBody">
@@ -22,6 +23,7 @@
                                 <td class="dataId"><%= entry.id %></td>
                                 <td><%= entry.date %></td>
                                 <td><button class="btn btn-sm btn-secondary view-data-button">View</button></td>
+                                <td><%= entry.description %></td>
                             </tr>
                             <% }) %>
                         </tbody>

