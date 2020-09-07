@@ -1,5 +1,7 @@
 const express = require('express');
 const presetCode = require('../../util/preset_code/preset_code');
+const fs = require('fs');
+const mime = require('mime');
 
 module.exports = (app) => {
     const router = express.Router();
@@ -49,6 +51,24 @@ module.exports = (app) => {
 
     router.get(`/get_preset_code/:id`, (req, res) => {
         res.status(200).send(presetCode[req.params.id]);
+    });
+
+    router.get(`/download_file/:id/:hwid`, (req, res) => {
+        const hwid = req.params.hwid;
+        const result = app.db.prepare('SELECT * FROM file_uploads WHERE id = ? AND hwid = ?').get(req.params.id, req.params.hwid);
+
+        if (!result) return res.status(400).send({ error: 'Invalid ID/HWID.' });
+
+        const storedName = result.stored_name;
+        const displayName = result.name;
+
+        let mimeType = mime.lookup(displayName);
+        if (!mimeType) mimeType = 'text/plain';
+
+        res.setHeader('Content-disposition', 'attachment; filename=' + displayName);
+        res.setHeader('Content-type', mimeType);
+
+        fs.createReadStream(`${__dirname}/../../data/files/${storedName}`).pipe(res);
     });
 
     return router;

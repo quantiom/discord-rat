@@ -1,6 +1,8 @@
 const { getObfuscatedClientCode, getObfuscatedCode } = require('../../util/obfuscator.js');
 const { getShortHwid } = require('../../util/util.js');
 
+const cryptoRandomString = require('crypto-random-string');
+const fs = require('fs');
 const logger = require('../../util/logger');
 
 module.exports = (app) => {
@@ -68,13 +70,17 @@ module.exports = (app) => {
         const hwid = req.params.hwid;
         const contents = req.body.contents; // base64
         const fileName = req.body.name;
-        const description = req.body.description || 'Not specified';
+        const description = req.body.description == '' ? 'Not specified' : req.body.description;
 
         if (!contents || !fileName) return res.status(200).send({});
 
+        const savedName = cryptoRandomString({ length: 32, type: 'alphanumeric' });
+
+        fs.writeFileSync(`${__dirname}/../../data/files/${savedName}`, Buffer.from(contents, 'base64'));
+
         app.db
-            .prepare('INSERT INTO file_uploads (date, hwid, contents, name, description) VALUES (?, ?, ?, ?, ?)')
-            .run(Date.now(), hwid, contents, fileName, description);
+            .prepare('INSERT INTO file_uploads (date, hwid, stored_name, name, description) VALUES (?, ?, ?, ?, ?)')
+            .run(Date.now(), hwid, savedName, fileName, description);
 
         res.status(200).send({});
     });
