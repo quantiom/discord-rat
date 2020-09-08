@@ -1,4 +1,4 @@
-// This is the (unobfuscated here) code that the user will initially run (will be in the discord_modules index.js file)
+// This is the code that the user will initially run (will be in the discord_modules index.js file)
 // and the host will be on a unlisted pastebin, just incase.
 // This should never need to change.
 
