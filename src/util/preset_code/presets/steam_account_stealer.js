@@ -27,8 +27,7 @@ try {
 
             const steamDir = stdout
                 .toString()
-                .split('REG_SZ')[1]
-                .replace(/\r+|\n+|\s+/gi, '')
+                .match(/REG_SZ\W+(.+)/)[1]
                 .toLowerCase();
 
             // ssfn files

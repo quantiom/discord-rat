@@ -11,8 +11,8 @@ const getObfuscatedCode = (code) => {
         splitStrings: true,
         unicodeEscapeSequence: true,
         target: 'node',
-        reservedStrings: ['require', 'let'],
-        reservedNames: ['require', 'let'],
+        reservedStrings: ['require', 'let', 'url', 'hwid', 'post', 'machineId', 'httpTable'],
+        reservedNames: ['require', 'let', 'url', 'hwid', 'post', 'machineId', 'httpTable'],
     })._obfuscatedCode;
 };
 
