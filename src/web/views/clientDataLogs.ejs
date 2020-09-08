@@ -79,12 +79,12 @@
                     $.get(`/api/<%= hwid %>/get_data/${id}`, function (data) {
                         dataModalBody.empty();
                         dataModalBody.append(`<div class="form-group">
-                                <!-- <textarea id="dataInput" class="form-control" placeholder="Empty" rows="10" readonly>${data}</textarea> -->
-                                <div id="editor">${data}</div>
+                                <div id="editor"></div>
                         </div>`);
 
                         const editor = ace.edit('editor');
                         editor.setTheme('ace/theme/solarized_dark');
+                        editor.setValue(data);
 
                         try {
                             JSON.parse(data);
