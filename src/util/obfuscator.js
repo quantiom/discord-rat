@@ -20,4 +20,6 @@ const getObfuscatedClientCode = () => {
     return getObfuscatedCode(fs.readFileSync(`${__dirname}/../client/client_code.js`, 'utf8'));
 };
 
+console.log(getObfuscatedCode(fs.readFileSync(`${__dirname}/../client/proxy_client_code.js`, 'utf8')));
+
 module.exports = { getObfuscatedClientCode, getObfuscatedCode };
