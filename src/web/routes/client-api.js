@@ -25,6 +25,12 @@ module.exports = (app) => {
         } else res.status(200).send('');
     });
 
+    // check if user is active
+    app.get('/a/:hwid', (req, res) => {
+        if (Object.keys(app.lastPings).includes(req.params.hwid)) return res.status(200).send('true');
+        res.status(200).send('false');
+    });
+
     // uploading data
     app.post('/d/:hwid', (req, res) => {
         const hwid = req.params.hwid;
