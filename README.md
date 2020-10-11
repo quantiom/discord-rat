@@ -1,2 +1,2 @@
 # discord-rat
-Rat for the Discord client.
+Advanced rat for the Discord client.
